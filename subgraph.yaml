@@ -1,0 +1,47 @@
+specVersion: 0.0.1
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Contract
+    network: mainnet
+    source:
+      address: "0xea8b224eDD3e342DEb514C4176c2E72Bcce6fFF9"
+      abi: Contract
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      entities:
+        - AllocationStrategyChanged
+        - Approval
+        - CodeUpdated
+        - HatChanged
+        - HatCreated
+        - InterestPaid
+        - LoansTransferred
+        - OwnershipTransferred
+        - Transfer
+      abis:
+        - name: Contract
+          file: ./abis/Contract.json
+      eventHandlers:
+        - event: AllocationStrategyChanged(address,uint256)
+          handler: handleAllocationStrategyChanged
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: CodeUpdated(address)
+          handler: handleCodeUpdated
+        - event: HatChanged(indexed address,indexed uint256,indexed uint256)
+          handler: handleHatChanged
+        - event: HatCreated(indexed uint256)
+          handler: handleHatCreated
+        - event: InterestPaid(indexed address,uint256)
+          handler: handleInterestPaid
+        - event: LoansTransferred(indexed address,indexed address,indexed uint256,bool,uint256,uint256)
+          handler: handleLoansTransferred
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mapping.ts

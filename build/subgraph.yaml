@@ -2,7 +2,7 @@ specVersion: 0.0.2
 description: Tracking interest on rDAI (mainnet)
 repository: https;//github.com/send-tribute/rdai-graph
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Contract
@@ -26,7 +26,7 @@ dataSources:
         - Transfer
       abis:
         - name: Contract
-          file: ./abis/Contract.json
+          file: Contract/abis/Contract.json
       eventHandlers:
         - event: AllocationStrategyChanged(address,uint256)
           handler: handleAllocationStrategyChanged
@@ -40,10 +40,11 @@ dataSources:
           handler: handleHatCreated
         - event: InterestPaid(indexed address,uint256)
           handler: handleInterestPaid
-        - event: LoansTransferred(indexed address,indexed address,indexed uint256,bool,uint256,uint256)
+        - event: LoansTransferred(indexed address,indexed address,indexed
+            uint256,bool,uint256,uint256)
           handler: handleLoansTransferred
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./src/mapping.ts
+      file: Contract/Contract.wasm

@@ -1,4 +1,11 @@
 type User @entity {
   id: ID!
-  interestEarned: BigDecimal
+  interestEarned: BigInt
+  recipientsList: [ID!]!
+  receivedInterest: [Source!]!
+}
+
+type Source @entity {
+  id: ID!
+  amount: BigInt!
 }

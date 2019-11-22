@@ -1,4 +1,4 @@
-import { BigDecimal } from '@graphprotocol/graph-ts';
+import { BigInt, Address } from '@graphprotocol/graph-ts';
 import {
   Contract,
   AllocationStrategyChanged,
@@ -11,18 +11,12 @@ import {
   OwnershipTransferred,
   Transfer
 } from '../generated/Contract/Contract';
-import { User } from '../generated/schema';
+import { User, Source } from '../generated/schema';
 
 export function handleInterestPaid(event: InterestPaid): void {
-  let entity = User.load(event.transaction.from.toHex());
+  let entity = loadUser(event.transaction.from.toHex());
 
-  if (entity == null) {
-    entity = new User(event.transaction.from.toHex());
-    entity.interestEarned = BigDecimal.fromString('0');
-  }
-
-  entity.interestEarned =
-    entity.interestEarned + event.params.amount.toBigDecimal();
+  entity.interestEarned = entity.interestEarned + event.params.amount;
 
   // Check if interest was earned by self-hat
 
@@ -32,84 +26,82 @@ export function handleInterestPaid(event: InterestPaid): void {
   entity.save();
 }
 
-// Note: If a handler doesn't require existing field values, it is faster
-// _not_ to load the entity from the store. Instead, create it fresh with
-// `new Entity(...)`, set the fields that should be updated and save the
-// entity back to the store. Fields that were not set or unset remain
-// unchanged, allowing for partial updates to be applied.
+export function handleHatChanged(event: HatChanged): void {
+  // let entity = loadUser(event.transaction.from.toHex());
+  //
+  // // Inspect the new hat recipients
+  // let contract = Contract.bind(event.address);
+  // let recipients = contract.getHatByID(event.params.newHatID).value0;
+  // recipients = recipients.forEach(item => item);
+  // // add any new recipients to the array
+  // let oldRecipients = entity.recipientsList;
+  // let newRecipients = recipients.concat(
+  //   recipients.filter(item => oldRecipients.indexOf(item) < 0)
+  // );
+  // entity.recipientsList = newRecipients;
+  //
+  // entity.save();
+}
 
-// It is also possible to access smart contracts from mappings. For
-// example, the contract that has emitted the event can be connected to
-// with:
-//
-// let contract = Contract.bind(event.address)
-//
-// The following functions can then be called on this contract to access
-// state variables and other data:
-//
-// - contract.ALLOCATION_STRATEGY_EXCHANGE_RATE_SCALE(...)
-// - contract.INITIAL_SAVING_ASSET_CONVERSION_RATE(...)
-// - contract.MAX_NUM_HAT_RECIPIENTS(...)
-// - contract.MAX_UINT256(...)
-// - contract.PROPORTION_BASE(...)
-// - contract.SELF_HAT_ID(...)
-// - contract._guardCounter(...)
-// - contract._owner(...)
-// - contract.accountStats(...)
-// - contract.accounts(...)
-// - contract.allowance(...)
-// - contract.approve(...)
-// - contract.balanceOf(...)
-// - contract.changeHat(...)
-// - contract.createHat(...)
-// - contract.decimals(...)
-// - contract.getAccountStats(...)
-// - contract.getCurrentAllocationStrategy(...)
-// - contract.getCurrentSavingStrategy(...)
-// - contract.getGlobalStats(...)
-// - contract.getHatByAddress(...)
-// - contract.getHatByID(...)
-// - contract.getHatStats(...)
-// - contract.getMaximumHatID(...)
-// - contract.getSavingAssetBalance(...)
-// - contract.hatStats(...)
-// - contract.ias(...)
-// - contract.initialized(...)
-// - contract.interestPayableOf(...)
-// - contract.isOwner(...)
-// - contract.mint(...)
-// - contract.mintWithNewHat(...)
-// - contract.mintWithSelectedHat(...)
-// - contract.name(...)
-// - contract.owner(...)
-// - contract.payInterest(...)
-// - contract.proxiableUUID(...)
-// - contract.receivedLoanOf(...)
-// - contract.receivedSavingsOf(...)
-// - contract.redeem(...)
-// - contract.redeemAll(...)
-// - contract.redeemAndTransfer(...)
-// - contract.redeemAndTransferAll(...)
-// - contract.savingAssetConversionRate(...)
-// - contract.savingAssetOrignalAmount(...)
-// - contract.symbol(...)
-// - contract.token(...)
-// - contract.totalSupply(...)
-// - contract.transfer(...)
-// - contract.transferAll(...)
-// - contract.transferAllFrom(...)
-// - contract.transferAllowances(...)
-// - contract.transferFrom(...)
+// Load all the sources of incoming interest
+// internal
+
+// external
+
+// Sum it all up
+
+// Multiply each person's balance by their proportion to get weighted contribution.
 
 export function handleApproval(event: Approval): void {}
 
 export function handleCodeUpdated(event: CodeUpdated): void {}
 
-export function handleHatChanged(event: HatChanged): void {}
-
 export function handleHatCreated(event: HatCreated): void {}
 
-export function handleLoansTransferred(event: LoansTransferred): void {}
+export function handleLoansTransferred(event: LoansTransferred): void {
+  let entity = loadUser(event.transaction.from.toHex());
+  let recipient = event.params.recipient.toString();
+  let sender = event.params.owner.toString();
+
+  let isNewSender = true;
+  let receivedInterest = entity.receivedInterest;
+  let newReceivedInterest = receivedInterest;
+  // const doesIncludeSource = entity.receivedInterest.find(source => source.address === sender)
+  for (let i: i32 = 0; i < receivedInterest.length; i++) {
+    let sourceId = receivedInterest[i];
+    let source = loadSource(sourceId);
+    // If event.transaction.from is the recipient
+    if (recipient === entity.id) {
+      // If the sender has previously sent interest, add it
+      if (source.id === sender) {
+        let amount = source.amount + event.params.redeemableAmount;
+        newReceivedInterest.splice(i, 1);
+        let updatedSource = new Source(sender);
+        newReceivedInterest.push(updatedSource);
+        // newReceivedInterest[i] = source.amount + event.params.redeemableAmount;
+        // Prevent adding a new sender to the list
+        isNewSender = false;
+        return;
+      }
+    }
+    // If event.transaction.from is not the recipient
+  }
+
+  // if (isNewSender) {
+  //   let newSource = new Source(sender);
+  //   newReceivedInterest.push(newSource);
+  // }
+  entity.receivedInterest = newReceivedInterest;
+
+  // LoansTransferred(owner, recipient, hatID,
+  //     isDistribution,
+  //     redeemableAmount,
+  //     sInternalAmount);
+
+  entity.save();
+}
+
+// log.info("New interest addded", source.amount)
 
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
 
@@ -118,3 +110,27 @@ export function handleAllocationStrategyChanged(
 ): void {}
 
 export function handleTransfer(event: Transfer): void {}
+
+function loadUser(address: string): User | null {
+  let entity = User.load(address);
+
+  if (entity == null) {
+    entity = new User(address);
+    entity.interestEarned = new BigInt(0);
+    entity.recipientsList = [];
+    entity.receivedInterest = [];
+  }
+
+  return entity;
+}
+
+function loadSource(address: string): Source | null {
+  let entity = Source.load(address);
+
+  if (entity == null) {
+    entity = new Source(address);
+    entity.amount = new BigInt(0);
+  }
+
+  return entity;
+}

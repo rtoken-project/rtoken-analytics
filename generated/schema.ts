@@ -42,20 +42,78 @@ export class User extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get interestEarned(): BigDecimal | null {
+  get interestEarned(): BigInt | null {
     let value = this.get("interestEarned");
     if (value === null) {
       return null;
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set interestEarned(value: BigDecimal | null) {
+  set interestEarned(value: BigInt | null) {
     if (value === null) {
       this.unset("interestEarned");
     } else {
-      this.set("interestEarned", Value.fromBigDecimal(value as BigDecimal));
+      this.set("interestEarned", Value.fromBigInt(value as BigInt));
     }
+  }
+
+  get recipientsList(): Array<string> {
+    let value = this.get("recipientsList");
+    return value.toStringArray();
+  }
+
+  set recipientsList(value: Array<string>) {
+    this.set("recipientsList", Value.fromStringArray(value));
+  }
+
+  get receivedInterest(): Array<string> {
+    let value = this.get("receivedInterest");
+    return value.toStringArray();
+  }
+
+  set receivedInterest(value: Array<string>) {
+    this.set("receivedInterest", Value.fromStringArray(value));
+  }
+}
+
+export class Source extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Source entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Source entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Source", id.toString(), this);
+  }
+
+  static load(id: string): Source | null {
+    return store.get("Source", id) as Source | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get amount(): BigInt {
+    let value = this.get("amount");
+    return value.toBigInt();
+  }
+
+  set amount(value: BigInt) {
+    this.set("amount", Value.fromBigInt(value));
   }
 }

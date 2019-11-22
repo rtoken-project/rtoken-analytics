@@ -68,13 +68,13 @@ export class User extends Entity {
     this.set("recipientsList", Value.fromStringArray(value));
   }
 
-  get receivedInterest(): Array<string> {
-    let value = this.get("receivedInterest");
+  get interestSourceList(): Array<string> {
+    let value = this.get("interestSourceList");
     return value.toStringArray();
   }
 
-  set receivedInterest(value: Array<string>) {
-    this.set("receivedInterest", Value.fromStringArray(value));
+  set interestSourceList(value: Array<string>) {
+    this.set("interestSourceList", Value.fromStringArray(value));
   }
 }
 
@@ -108,13 +108,13 @@ export class Source extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get timeStarted(): i32 {
+  get timeStarted(): string {
     let value = this.get("timeStarted");
-    return value.toI32();
+    return value.toString();
   }
 
-  set timeStarted(value: i32) {
-    this.set("timeStarted", Value.fromI32(value));
+  set timeStarted(value: string) {
+    this.set("timeStarted", Value.fromString(value));
   }
 
   get interestRateFloor(): BigInt {
@@ -126,13 +126,13 @@ export class Source extends Entity {
     this.set("interestRateFloor", Value.fromBigInt(value));
   }
 
-  get internalSavings(): BigInt {
-    let value = this.get("internalSavings");
+  get sInternalAmount(): BigInt {
+    let value = this.get("sInternalAmount");
     return value.toBigInt();
   }
 
-  set internalSavings(value: BigInt) {
-    this.set("internalSavings", Value.fromBigInt(value));
+  set sInternalAmount(value: BigInt) {
+    this.set("sInternalAmount", Value.fromBigInt(value));
   }
 
   get redeemableAmount(): BigInt {

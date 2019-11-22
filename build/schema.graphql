@@ -2,10 +2,13 @@ type User @entity {
   id: ID!
   interestEarned: BigInt
   recipientsList: [ID!]!
-  receivedInterest: [Source!]!
+  interestSourceList: [Source!]!
 }
 
 type Source @entity {
   id: ID!
-  amount: BigInt!
+  timeStarted: String!
+  interestRateFloor: BigInt!
+  sInternalAmount: BigInt!
+  redeemableAmount: BigInt!
 }

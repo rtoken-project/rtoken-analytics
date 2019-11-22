@@ -77,14 +77,12 @@ export function handleLoansTransferred(event: LoansTransferred): void {
 
   let entity = loadUser(recipient);
   let interestSourceList = entity.interestSourceList;
-  let source = new Source(sender);
 
   // Check if the sender has previously sent interest
   let isNewSender = true;
   for (let i: i32 = 0; i < interestSourceList.length; i++) {
     let thisSource = Source.load(interestSourceList[i]);
     if (thisSource !== null && thisSource.id === sender) {
-      source = thisSource;
       isNewSender = false;
       return;
     }
@@ -92,18 +90,22 @@ export function handleLoansTransferred(event: LoansTransferred): void {
 
   if (isNewSender) {
     // NOTE: Assumes isDistribution === true, since this is a new loan
-    source.timeStarted = new Date().getTime();
+    let source = new Source(sender);
+    source.timeStarted = event.block.timestamp.toString();
     source.interestRateFloor = exchangeRateStored;
     source.redeemableAmount = redeemableAmount;
     source.sInternalAmount = sInternalAmount;
+    source.save();
   } else {
     // Sender is already present in interestSourceList
+    let source = Source.load(sender);
     source.redeemableAmount = redeemableAmount;
     let newSInternal = source.sInternalAmount - sInternalAmount;
     if (isDistribution) {
       let newSInternal = source.sInternalAmount + sInternalAmount;
     }
     source.sInternalAmount = newSInternal;
+    source.save();
   }
 
   // You know how much cDAI you've received from whome
@@ -111,8 +113,6 @@ export function handleLoansTransferred(event: LoansTransferred): void {
   // redeemable amount is the amount I need to pay back
   // sInternal is how much I get to keep
   // Can use allocation strategy to get exchange rate
-
-  source.save();
 }
 
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
@@ -130,7 +130,7 @@ function loadUser(address: string): User | null {
     entity = new User(address);
     entity.interestEarned = new BigInt(0);
     entity.recipientsList = [];
-    entity.receivedInterest = [];
+    entity.interestSourceList = [];
   }
 
   return entity;

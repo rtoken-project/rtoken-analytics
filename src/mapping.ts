@@ -60,13 +60,13 @@ export function handleHatCreated(event: HatCreated): void {}
 
 export function handleLoansTransferred(event: LoansTransferred): void {
   let entity = loadUser(event.transaction.from.toHex());
-  let recipient = event.params.recipient.toString();
-  let sender = event.params.owner.toString();
+  let recipient = event.params.recipient.toHex();
+  let sender = event.params.owner.toHex();
 
   let isNewSender = true;
   let receivedInterest = entity.receivedInterest;
   let newReceivedInterest = receivedInterest;
-  // const doesIncludeSource = entity.receivedInterest.find(source => source.address === sender)
+
   for (let i: i32 = 0; i < receivedInterest.length; i++) {
     let sourceId = receivedInterest[i];
     let source = loadSource(sourceId);
@@ -74,11 +74,9 @@ export function handleLoansTransferred(event: LoansTransferred): void {
     if (recipient === entity.id) {
       // If the sender has previously sent interest, add it
       if (source.id === sender) {
-        let amount = source.amount + event.params.redeemableAmount;
-        newReceivedInterest.splice(i, 1);
-        let updatedSource = new Source(sender);
-        newReceivedInterest.push(updatedSource);
-        // newReceivedInterest[i] = source.amount + event.params.redeemableAmount;
+        let newAmount = source.amount + event.params.redeemableAmount;
+        source.amount = newAmount;
+        source.save();
         // Prevent adding a new sender to the list
         isNewSender = false;
         return;
@@ -87,11 +85,13 @@ export function handleLoansTransferred(event: LoansTransferred): void {
     // If event.transaction.from is not the recipient
   }
 
-  // if (isNewSender) {
-  //   let newSource = new Source(sender);
-  //   newReceivedInterest.push(newSource);
-  // }
-  entity.receivedInterest = newReceivedInterest;
+  if (isNewSender) {
+    let newSource = loadSource(sender);
+    newSource.amount = event.params.redeemableAmount;
+    newSource.save();
+    newReceivedInterest.push(newSource.id);
+    entity.receivedInterest = newReceivedInterest;
+  }
 
   // LoansTransferred(owner, recipient, hatID,
   //     isDistribution,
@@ -100,8 +100,6 @@ export function handleLoansTransferred(event: LoansTransferred): void {
 
   entity.save();
 }
-
-// log.info("New interest addded", source.amount)
 
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
 

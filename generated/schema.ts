@@ -108,12 +108,39 @@ export class Source extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get amount(): BigInt {
-    let value = this.get("amount");
+  get timeStarted(): i32 {
+    let value = this.get("timeStarted");
+    return value.toI32();
+  }
+
+  set timeStarted(value: i32) {
+    this.set("timeStarted", Value.fromI32(value));
+  }
+
+  get interestRateFloor(): BigInt {
+    let value = this.get("interestRateFloor");
     return value.toBigInt();
   }
 
-  set amount(value: BigInt) {
-    this.set("amount", Value.fromBigInt(value));
+  set interestRateFloor(value: BigInt) {
+    this.set("interestRateFloor", Value.fromBigInt(value));
+  }
+
+  get internalSavings(): BigInt {
+    let value = this.get("internalSavings");
+    return value.toBigInt();
+  }
+
+  set internalSavings(value: BigInt) {
+    this.set("internalSavings", Value.fromBigInt(value));
+  }
+
+  get redeemableAmount(): BigInt {
+    let value = this.get("redeemableAmount");
+    return value.toBigInt();
+  }
+
+  set redeemableAmount(value: BigInt) {
+    this.set("redeemableAmount", Value.fromBigInt(value));
   }
 }

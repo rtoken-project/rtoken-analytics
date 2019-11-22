@@ -1,6 +1,6 @@
-import { BigInt, Address } from '@graphprotocol/graph-ts';
+import { BigInt } from '@graphprotocol/graph-ts';
 import {
-  Contract,
+  RToken,
   AllocationStrategyChanged,
   Approval,
   CodeUpdated,
@@ -10,7 +10,8 @@ import {
   LoansTransferred,
   OwnershipTransferred,
   Transfer
-} from '../generated/Contract/Contract';
+} from '../generated/RToken/RToken';
+import { CompoundAllocationStrategy } from '../generated/RToken/CompoundAllocationStrategy';
 import { User, Source } from '../generated/schema';
 
 export function handleInterestPaid(event: InterestPaid): void {
@@ -59,46 +60,59 @@ export function handleCodeUpdated(event: CodeUpdated): void {}
 export function handleHatCreated(event: HatCreated): void {}
 
 export function handleLoansTransferred(event: LoansTransferred): void {
-  let entity = loadUser(event.transaction.from.toHex());
-  let recipient = event.params.recipient.toHex();
-  let sender = event.params.owner.toHex();
-
-  let isNewSender = true;
-  let receivedInterest = entity.receivedInterest;
-  let newReceivedInterest = receivedInterest;
-
-  for (let i: i32 = 0; i < receivedInterest.length; i++) {
-    let sourceId = receivedInterest[i];
-    let source = loadSource(sourceId);
-    // If event.transaction.from is the recipient
-    if (recipient === entity.id) {
-      // If the sender has previously sent interest, add it
-      if (source.id === sender) {
-        let newAmount = source.amount + event.params.redeemableAmount;
-        source.amount = newAmount;
-        source.save();
-        // Prevent adding a new sender to the list
-        isNewSender = false;
-        return;
-      }
-    }
-    // If event.transaction.from is not the recipient
-  }
-
-  if (isNewSender) {
-    let newSource = loadSource(sender);
-    newSource.amount = event.params.redeemableAmount;
-    newSource.save();
-    newReceivedInterest.push(newSource.id);
-    entity.receivedInterest = newReceivedInterest;
-  }
-
   // LoansTransferred(owner, recipient, hatID,
   //     isDistribution,
   //     redeemableAmount,
-  //     sInternalAmount);
+  //     internalSavingsAmount);
 
-  entity.save();
+  let sender = event.params.owner.toHex();
+  let recipient = event.params.recipient.toHex();
+  let isDistribution = event.params.isDistribution;
+  let sInternalAmount = event.params.internalSavingsAmount;
+  let redeemableAmount = event.params.redeemableAmount;
+
+  let rTokenContract = RToken.bind(event.address);
+  let iasContract = CompoundAllocationStrategy.bind(rTokenContract.ias());
+  let exchangeRateStored = iasContract.exchangeRateStored();
+
+  let entity = loadUser(recipient);
+  let interestSourceList = entity.interestSourceList;
+  let source = new Source(sender);
+
+  // Check if the sender has previously sent interest
+  let isNewSender = true;
+  for (let i: i32 = 0; i < interestSourceList.length; i++) {
+    let thisSource = Source.load(interestSourceList[i]);
+    if (thisSource !== null && thisSource.id === sender) {
+      source = thisSource;
+      isNewSender = false;
+      return;
+    }
+  }
+
+  if (isNewSender) {
+    // NOTE: Assumes isDistribution === true, since this is a new loan
+    source.timeStarted = new Date().getTime();
+    source.interestRateFloor = exchangeRateStored;
+    source.redeemableAmount = redeemableAmount;
+    source.sInternalAmount = sInternalAmount;
+  } else {
+    // Sender is already present in interestSourceList
+    source.redeemableAmount = redeemableAmount;
+    let newSInternal = source.sInternalAmount - sInternalAmount;
+    if (isDistribution) {
+      let newSInternal = source.sInternalAmount + sInternalAmount;
+    }
+    source.sInternalAmount = newSInternal;
+  }
+
+  // You know how much cDAI you've received from whome
+  // You don't know exchange rate between cDAI and rDAI
+  // redeemable amount is the amount I need to pay back
+  // sInternal is how much I get to keep
+  // Can use allocation strategy to get exchange rate
+
+  source.save();
 }
 
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
@@ -117,17 +131,6 @@ function loadUser(address: string): User | null {
     entity.interestEarned = new BigInt(0);
     entity.recipientsList = [];
     entity.receivedInterest = [];
-  }
-
-  return entity;
-}
-
-function loadSource(address: string): Source | null {
-  let entity = Source.load(address);
-
-  if (entity == null) {
-    entity = new Source(address);
-    entity.amount = new BigInt(0);
   }
 
   return entity;

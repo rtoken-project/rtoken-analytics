@@ -233,7 +233,7 @@ export class Transfer__Params {
   }
 }
 
-export class Contract__accountsResult {
+export class RToken__accountsResult {
   value0: BigInt;
   value1: BigInt;
   value2: BigInt;
@@ -265,7 +265,7 @@ export class Contract__accountsResult {
   }
 }
 
-export class Contract__getAccountStatsResultStatsStruct extends EthereumTuple {
+export class RToken__getAccountStatsResultStatsStruct extends EthereumTuple {
   get hatID(): BigInt {
     return this[0].toBigInt();
   }
@@ -295,7 +295,7 @@ export class Contract__getAccountStatsResultStatsStruct extends EthereumTuple {
   }
 }
 
-export class Contract__getGlobalStatsResultValue0Struct extends EthereumTuple {
+export class RToken__getGlobalStatsResultValue0Struct extends EthereumTuple {
   get totalSupply(): BigInt {
     return this[0].toBigInt();
   }
@@ -305,7 +305,7 @@ export class Contract__getGlobalStatsResultValue0Struct extends EthereumTuple {
   }
 }
 
-export class Contract__getHatByAddressResult {
+export class RToken__getHatByAddressResult {
   value0: BigInt;
   value1: Array<Address>;
   value2: Array<BigInt>;
@@ -325,7 +325,7 @@ export class Contract__getHatByAddressResult {
   }
 }
 
-export class Contract__getHatByIDResult {
+export class RToken__getHatByIDResult {
   value0: Array<Address>;
   value1: Array<BigInt>;
 
@@ -342,7 +342,7 @@ export class Contract__getHatByIDResult {
   }
 }
 
-export class Contract__getHatStatsResultStatsStruct extends EthereumTuple {
+export class RToken__getHatStatsResultStatsStruct extends EthereumTuple {
   get useCount(): BigInt {
     return this[0].toBigInt();
   }
@@ -356,7 +356,7 @@ export class Contract__getHatStatsResultStatsStruct extends EthereumTuple {
   }
 }
 
-export class Contract__getSavingAssetBalanceResult {
+export class RToken__getSavingAssetBalanceResult {
   value0: BigInt;
   value1: BigInt;
 
@@ -373,7 +373,7 @@ export class Contract__getSavingAssetBalanceResult {
   }
 }
 
-export class Contract__hatStatsResult {
+export class RToken__hatStatsResult {
   value0: BigInt;
   value1: BigInt;
   value2: BigInt;
@@ -393,9 +393,9 @@ export class Contract__hatStatsResult {
   }
 }
 
-export class Contract extends SmartContract {
-  static bind(address: Address): Contract {
-    return new Contract("Contract", address);
+export class RToken extends SmartContract {
+  static bind(address: Address): RToken {
+    return new RToken("RToken", address);
   }
 
   ALLOCATION_STRATEGY_EXCHANGE_RATE_SCALE(): BigInt {
@@ -537,10 +537,10 @@ export class Contract extends SmartContract {
     return CallResult.fromValue(value[0].toBigInt());
   }
 
-  accounts(param0: Address): Contract__accountsResult {
+  accounts(param0: Address): RToken__accountsResult {
     let result = super.call("accounts", [EthereumValue.fromAddress(param0)]);
 
-    return new Contract__accountsResult(
+    return new RToken__accountsResult(
       result[0].toBigInt(),
       result[1].toBigInt(),
       result[2].toBigInt(),
@@ -549,14 +549,14 @@ export class Contract extends SmartContract {
     );
   }
 
-  try_accounts(param0: Address): CallResult<Contract__accountsResult> {
+  try_accounts(param0: Address): CallResult<RToken__accountsResult> {
     let result = super.tryCall("accounts", [EthereumValue.fromAddress(param0)]);
     if (result.reverted) {
       return new CallResult();
     }
     let value = result.value;
     return CallResult.fromValue(
-      new Contract__accountsResult(
+      new RToken__accountsResult(
         value[0].toBigInt(),
         value[1].toBigInt(),
         value[2].toBigInt(),
@@ -688,17 +688,17 @@ export class Contract extends SmartContract {
     return CallResult.fromValue(value[0].toBigInt());
   }
 
-  getAccountStats(owner: Address): Contract__getAccountStatsResultStatsStruct {
+  getAccountStats(owner: Address): RToken__getAccountStatsResultStatsStruct {
     let result = super.call("getAccountStats", [
       EthereumValue.fromAddress(owner)
     ]);
 
-    return result[0].toTuple() as Contract__getAccountStatsResultStatsStruct;
+    return result[0].toTuple() as RToken__getAccountStatsResultStatsStruct;
   }
 
   try_getAccountStats(
     owner: Address
-  ): CallResult<Contract__getAccountStatsResultStatsStruct> {
+  ): CallResult<RToken__getAccountStatsResultStatsStruct> {
     let result = super.tryCall("getAccountStats", [
       EthereumValue.fromAddress(owner)
     ]);
@@ -707,7 +707,7 @@ export class Contract extends SmartContract {
     }
     let value = result.value;
     return CallResult.fromValue(
-      value[0].toTuple() as Contract__getAccountStatsResultStatsStruct
+      value[0].toTuple() as RToken__getAccountStatsResultStatsStruct
     );
   }
 
@@ -741,29 +741,29 @@ export class Contract extends SmartContract {
     return CallResult.fromValue(value[0].toAddress());
   }
 
-  getGlobalStats(): Contract__getGlobalStatsResultValue0Struct {
+  getGlobalStats(): RToken__getGlobalStatsResultValue0Struct {
     let result = super.call("getGlobalStats", []);
 
-    return result[0].toTuple() as Contract__getGlobalStatsResultValue0Struct;
+    return result[0].toTuple() as RToken__getGlobalStatsResultValue0Struct;
   }
 
-  try_getGlobalStats(): CallResult<Contract__getGlobalStatsResultValue0Struct> {
+  try_getGlobalStats(): CallResult<RToken__getGlobalStatsResultValue0Struct> {
     let result = super.tryCall("getGlobalStats", []);
     if (result.reverted) {
       return new CallResult();
     }
     let value = result.value;
     return CallResult.fromValue(
-      value[0].toTuple() as Contract__getGlobalStatsResultValue0Struct
+      value[0].toTuple() as RToken__getGlobalStatsResultValue0Struct
     );
   }
 
-  getHatByAddress(owner: Address): Contract__getHatByAddressResult {
+  getHatByAddress(owner: Address): RToken__getHatByAddressResult {
     let result = super.call("getHatByAddress", [
       EthereumValue.fromAddress(owner)
     ]);
 
-    return new Contract__getHatByAddressResult(
+    return new RToken__getHatByAddressResult(
       result[0].toBigInt(),
       result[1].toAddressArray(),
       result[2].toBigIntArray()
@@ -772,7 +772,7 @@ export class Contract extends SmartContract {
 
   try_getHatByAddress(
     owner: Address
-  ): CallResult<Contract__getHatByAddressResult> {
+  ): CallResult<RToken__getHatByAddressResult> {
     let result = super.tryCall("getHatByAddress", [
       EthereumValue.fromAddress(owner)
     ]);
@@ -781,7 +781,7 @@ export class Contract extends SmartContract {
     }
     let value = result.value;
     return CallResult.fromValue(
-      new Contract__getHatByAddressResult(
+      new RToken__getHatByAddressResult(
         value[0].toBigInt(),
         value[1].toAddressArray(),
         value[2].toBigIntArray()
@@ -789,18 +789,18 @@ export class Contract extends SmartContract {
     );
   }
 
-  getHatByID(hatID: BigInt): Contract__getHatByIDResult {
+  getHatByID(hatID: BigInt): RToken__getHatByIDResult {
     let result = super.call("getHatByID", [
       EthereumValue.fromUnsignedBigInt(hatID)
     ]);
 
-    return new Contract__getHatByIDResult(
+    return new RToken__getHatByIDResult(
       result[0].toAddressArray(),
       result[1].toBigIntArray()
     );
   }
 
-  try_getHatByID(hatID: BigInt): CallResult<Contract__getHatByIDResult> {
+  try_getHatByID(hatID: BigInt): CallResult<RToken__getHatByIDResult> {
     let result = super.tryCall("getHatByID", [
       EthereumValue.fromUnsignedBigInt(hatID)
     ]);
@@ -809,24 +809,24 @@ export class Contract extends SmartContract {
     }
     let value = result.value;
     return CallResult.fromValue(
-      new Contract__getHatByIDResult(
+      new RToken__getHatByIDResult(
         value[0].toAddressArray(),
         value[1].toBigIntArray()
       )
     );
   }
 
-  getHatStats(hatID: BigInt): Contract__getHatStatsResultStatsStruct {
+  getHatStats(hatID: BigInt): RToken__getHatStatsResultStatsStruct {
     let result = super.call("getHatStats", [
       EthereumValue.fromUnsignedBigInt(hatID)
     ]);
 
-    return result[0].toTuple() as Contract__getHatStatsResultStatsStruct;
+    return result[0].toTuple() as RToken__getHatStatsResultStatsStruct;
   }
 
   try_getHatStats(
     hatID: BigInt
-  ): CallResult<Contract__getHatStatsResultStatsStruct> {
+  ): CallResult<RToken__getHatStatsResultStatsStruct> {
     let result = super.tryCall("getHatStats", [
       EthereumValue.fromUnsignedBigInt(hatID)
     ]);
@@ -835,7 +835,7 @@ export class Contract extends SmartContract {
     }
     let value = result.value;
     return CallResult.fromValue(
-      value[0].toTuple() as Contract__getHatStatsResultStatsStruct
+      value[0].toTuple() as RToken__getHatStatsResultStatsStruct
     );
   }
 
@@ -854,44 +854,42 @@ export class Contract extends SmartContract {
     return CallResult.fromValue(value[0].toBigInt());
   }
 
-  getSavingAssetBalance(): Contract__getSavingAssetBalanceResult {
+  getSavingAssetBalance(): RToken__getSavingAssetBalanceResult {
     let result = super.call("getSavingAssetBalance", []);
 
-    return new Contract__getSavingAssetBalanceResult(
+    return new RToken__getSavingAssetBalanceResult(
       result[0].toBigInt(),
       result[1].toBigInt()
     );
   }
 
-  try_getSavingAssetBalance(): CallResult<
-    Contract__getSavingAssetBalanceResult
-  > {
+  try_getSavingAssetBalance(): CallResult<RToken__getSavingAssetBalanceResult> {
     let result = super.tryCall("getSavingAssetBalance", []);
     if (result.reverted) {
       return new CallResult();
     }
     let value = result.value;
     return CallResult.fromValue(
-      new Contract__getSavingAssetBalanceResult(
+      new RToken__getSavingAssetBalanceResult(
         value[0].toBigInt(),
         value[1].toBigInt()
       )
     );
   }
 
-  hatStats(param0: BigInt): Contract__hatStatsResult {
+  hatStats(param0: BigInt): RToken__hatStatsResult {
     let result = super.call("hatStats", [
       EthereumValue.fromUnsignedBigInt(param0)
     ]);
 
-    return new Contract__hatStatsResult(
+    return new RToken__hatStatsResult(
       result[0].toBigInt(),
       result[1].toBigInt(),
       result[2].toBigInt()
     );
   }
 
-  try_hatStats(param0: BigInt): CallResult<Contract__hatStatsResult> {
+  try_hatStats(param0: BigInt): CallResult<RToken__hatStatsResult> {
     let result = super.tryCall("hatStats", [
       EthereumValue.fromUnsignedBigInt(param0)
     ]);
@@ -900,7 +898,7 @@ export class Contract extends SmartContract {
     }
     let value = result.value;
     return CallResult.fromValue(
-      new Contract__hatStatsResult(
+      new RToken__hatStatsResult(
         value[0].toBigInt(),
         value[1].toBigInt(),
         value[2].toBigInt()

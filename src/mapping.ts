@@ -17,7 +17,7 @@ import { User, Loan } from '../generated/schema';
 export function handleInterestPaid(event: InterestPaid): void {
   let entity = loadUser(event.transaction.from.toHex());
 
-  entity.interestEarned = entity.interestEarned + event.params.amount;
+  // entity.interestEarned = entity.interestEarned + event.params.amount;
 
   // Check if interest was earned by self-hat
 
@@ -67,17 +67,18 @@ export function handleLoansTransferred(event: LoansTransferred): void {
   //     internalSavingsAmount);
 
   // Load user entities
-  let from = event.params.owner.toHex();
+  let fromBytes = event.params.owner;
+  let from = fromBytes.toHex();
   let userFrom = loadUser(from);
   let sentAddressList = userFrom.sentAddressList;
 
-  let to = event.params.recipient.toHex();
+  let toBytes = event.params.recipient;
+  let to = toBytes.toHex();
   let userTo = loadUser(to);
   let receivedAddressList = userTo.receivedAddressList;
 
   // Load loan entity
-  let loanID = getLoanID(from, to);
-  let loan = loadLoan(loanID, event.block.timestamp.toString());
+  let loan = loadLoan(from, to, event.block.timestamp.toString());
 
   // Get event details
   let isDistribution = event.params.isDistribution;
@@ -91,17 +92,17 @@ export function handleLoansTransferred(event: LoansTransferred): void {
   // Check if this is a new loan
   let isNewLoan = true;
   for (let i: i32 = 0; i < receivedAddressList.length; i++) {
-    if (receivedAddressList[i].id === from) {
+    if (receivedAddressList[i].toHex() === from) {
       isNewLoan = false;
       break;
     }
   }
   // If this is a new loan, add the addresses to the User's arrays
   if (isNewLoan) {
-    sentAddressList.push(to);
+    sentAddressList.push(toBytes);
     userFrom.sentAddressList = sentAddressList;
     userFrom.save();
-    receivedAddressList.push(from);
+    receivedAddressList.push(fromBytes);
     userTo.receivedAddressList = receivedAddressList;
     userTo.save();
   }
@@ -130,12 +131,12 @@ export function handleAllocationStrategyChanged(
 
 export function handleTransfer(event: Transfer): void {}
 
-function loadUser(address: string): User {
+function loadUser(address: String): User | null {
   let entity = User.load(address);
 
   if (entity == null) {
     entity = new User(address);
-    entity.interestEarned = new BigInt(0);
+    entity.totalInterestEarned = new BigInt(0);
     entity.receivedAddressList = [];
     entity.sentAddressList = [];
   }
@@ -143,7 +144,7 @@ function loadUser(address: string): User {
   return entity;
 }
 
-function loadLoan(from: Address, to: Address, currentTime: String): Loan {
+function loadLoan(from: String, to: String, currentTime: String): Loan | null {
   let loanId = getLoanID(from, to);
   let entity = Loan.load(loanId);
   if (entity == null) {
@@ -160,7 +161,7 @@ function loadLoan(from: Address, to: Address, currentTime: String): Loan {
 }
 
 // Returns "<fromAddress>-<toAddress>"
-function getLoanID(from: Address, to: Address): String {
+function getLoanID(from: String, to: String): String {
   let fromString = from.toString().concat('-');
   let toString = to.toString();
   return fromString.concat(toString);

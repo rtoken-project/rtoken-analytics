@@ -76,6 +76,43 @@ export class User extends Entity {
   set sentAddressList(value: Array<Bytes>) {
     this.set("sentAddressList", Value.fromBytesArray(value));
   }
+
+  get receivedLoansList(): Array<string> | null {
+    let value = this.get("receivedLoansList");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set receivedLoansList(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("receivedLoansList");
+    } else {
+      this.set(
+        "receivedLoansList",
+        Value.fromStringArray(value as Array<string>)
+      );
+    }
+  }
+
+  get sentLoansList(): Array<string> | null {
+    let value = this.get("sentLoansList");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set sentLoansList(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("sentLoansList");
+    } else {
+      this.set("sentLoansList", Value.fromStringArray(value as Array<string>));
+    }
+  }
 }
 
 export class Loan extends Entity {
@@ -97,6 +134,24 @@ export class Loan extends Entity {
 
   static load(id: string): Loan | null {
     return store.get("Loan", id) as Loan | null;
+  }
+
+  get from(): string {
+    let value = this.get("from");
+    return value.toString();
+  }
+
+  set from(value: string) {
+    this.set("from", Value.fromString(value));
+  }
+
+  get to(): string {
+    let value = this.get("to");
+    return value.toString();
+  }
+
+  set to(value: string) {
+    this.set("to", Value.fromString(value));
   }
 
   get id(): string {

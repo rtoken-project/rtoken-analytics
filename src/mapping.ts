@@ -96,6 +96,9 @@ export function handleLoansTransferred(event: LoansTransferred): void {
     source.redeemableAmount = redeemableAmount;
     source.sInternalAmount = sInternalAmount;
     source.save();
+    interestSourceList.push(source.id);
+    entity.interestSourceList = interestSourceList;
+    entity.save();
   } else {
     // Sender is already present in interestSourceList
     let source = Source.load(sender);

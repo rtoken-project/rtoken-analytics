@@ -1,4 +1,4 @@
-import { BigInt } from '@graphprotocol/graph-ts';
+import { BigInt, Bytes, Address } from '@graphprotocol/graph-ts';
 import {
   RToken,
   AllocationStrategyChanged,
@@ -12,7 +12,7 @@ import {
   Transfer
 } from '../generated/RToken/RToken';
 import { CompoundAllocationStrategy } from '../generated/RToken/CompoundAllocationStrategy';
-import { User, Source } from '../generated/schema';
+import { User, Loan } from '../generated/schema';
 
 export function handleInterestPaid(event: InterestPaid): void {
   let entity = loadUser(event.transaction.from.toHex());
@@ -60,56 +60,60 @@ export function handleCodeUpdated(event: CodeUpdated): void {}
 export function handleHatCreated(event: HatCreated): void {}
 
 export function handleLoansTransferred(event: LoansTransferred): void {
+  // Info: Event parameters:
   // LoansTransferred(owner, recipient, hatID,
   //     isDistribution,
   //     redeemableAmount,
   //     internalSavingsAmount);
 
-  let sender = event.params.owner.toHex();
-  let recipient = event.params.recipient.toHex();
+  // Load user entities
+  let from = event.params.owner.toHex();
+  let userFrom = loadUser(from);
+  let sentAddressList = userFrom.sentAddressList;
+
+  let to = event.params.recipient.toHex();
+  let userTo = loadUser(to);
+  let receivedAddressList = userTo.receivedAddressList;
+
+  // Load loan entity
+  let loanID = getLoanID(from, to);
+  let loan = loadLoan(loanID, event.block.timestamp.toString());
+
+  // Get event details
   let isDistribution = event.params.isDistribution;
   let sInternalAmount = event.params.internalSavingsAmount;
   let redeemableAmount = event.params.redeemableAmount;
-
-  let rTokenContract = RToken.bind(event.address);
-  let iasContract = CompoundAllocationStrategy.bind(rTokenContract.ias());
+  let iasContract = CompoundAllocationStrategy.bind(
+    RToken.bind(event.address).ias()
+  );
   let exchangeRateStored = iasContract.exchangeRateStored();
 
-  let entity = loadUser(recipient);
-  let interestSourceList = entity.interestSourceList;
-
-  // Check if the sender has previously sent interest
-  let isNewSender = true;
-  for (let i: i32 = 0; i < interestSourceList.length; i++) {
-    let thisSource = Source.load(interestSourceList[i]);
-    if (thisSource !== null && thisSource.id === sender) {
-      isNewSender = false;
-      return;
+  // Check if this is a new loan
+  let isNewLoan = true;
+  for (let i: i32 = 0; i < receivedAddressList.length; i++) {
+    if (receivedAddressList[i].id === from) {
+      isNewLoan = false;
+      break;
     }
   }
-
-  if (isNewSender) {
-    // NOTE: Assumes isDistribution === true, since this is a new loan
-    let source = new Source(sender);
-    source.timeStarted = event.block.timestamp.toString();
-    source.interestRateFloor = exchangeRateStored;
-    source.redeemableAmount = redeemableAmount;
-    source.sInternalAmount = sInternalAmount;
-    source.save();
-    interestSourceList.push(source.id);
-    entity.interestSourceList = interestSourceList;
-    entity.save();
-  } else {
-    // Sender is already present in interestSourceList
-    let source = Source.load(sender);
-    source.redeemableAmount = redeemableAmount;
-    let newSInternal = source.sInternalAmount - sInternalAmount;
-    if (isDistribution) {
-      let newSInternal = source.sInternalAmount + sInternalAmount;
-    }
-    source.sInternalAmount = newSInternal;
-    source.save();
+  // If this is a new loan, add the addresses to the User's arrays
+  if (isNewLoan) {
+    sentAddressList.push(to);
+    userFrom.sentAddressList = sentAddressList;
+    userFrom.save();
+    receivedAddressList.push(from);
+    userTo.receivedAddressList = receivedAddressList;
+    userTo.save();
   }
+
+  // Update loan details
+  loan.redeemableAmount = redeemableAmount;
+  let newSInternal = loan.sInternalAmount - sInternalAmount;
+  if (isDistribution) {
+    let newSInternal = loan.sInternalAmount + sInternalAmount;
+  }
+  loan.sInternalAmount = newSInternal;
+  loan.save();
 
   // You know how much cDAI you've received from whome
   // You don't know exchange rate between cDAI and rDAI
@@ -126,15 +130,38 @@ export function handleAllocationStrategyChanged(
 
 export function handleTransfer(event: Transfer): void {}
 
-function loadUser(address: string): User | null {
+function loadUser(address: string): User {
   let entity = User.load(address);
 
   if (entity == null) {
     entity = new User(address);
     entity.interestEarned = new BigInt(0);
-    entity.recipientsList = [];
-    entity.interestSourceList = [];
+    entity.receivedAddressList = [];
+    entity.sentAddressList = [];
   }
 
   return entity;
+}
+
+function loadLoan(from: Address, to: Address, currentTime: String): Loan {
+  let loanId = getLoanID(from, to);
+  let entity = Loan.load(loanId);
+  if (entity == null) {
+    entity = new Loan(loanId);
+    entity.from = from;
+    entity.to = to;
+    entity.timeStarted = currentTime;
+    entity.interestRateFloor = new BigInt(0);
+    entity.redeemableAmount = new BigInt(0);
+    entity.sInternalAmount = new BigInt(0);
+  }
+
+  return entity;
+}
+
+// Returns "<fromAddress>-<toAddress>"
+function getLoanID(from: Address, to: Address): String {
+  let fromString = from.toString().concat('-');
+  let toString = to.toString();
+  return fromString.concat(toString);
 }

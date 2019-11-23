@@ -42,8 +42,8 @@ export class User extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get interestEarned(): BigInt | null {
-    let value = this.get("interestEarned");
+  get totalInterestEarned(): BigInt | null {
+    let value = this.get("totalInterestEarned");
     if (value === null) {
       return null;
     } else {
@@ -51,34 +51,34 @@ export class User extends Entity {
     }
   }
 
-  set interestEarned(value: BigInt | null) {
+  set totalInterestEarned(value: BigInt | null) {
     if (value === null) {
-      this.unset("interestEarned");
+      this.unset("totalInterestEarned");
     } else {
-      this.set("interestEarned", Value.fromBigInt(value as BigInt));
+      this.set("totalInterestEarned", Value.fromBigInt(value as BigInt));
     }
   }
 
-  get recipientsList(): Array<string> {
-    let value = this.get("recipientsList");
-    return value.toStringArray();
+  get receivedAddressList(): Array<Bytes> {
+    let value = this.get("receivedAddressList");
+    return value.toBytesArray();
   }
 
-  set recipientsList(value: Array<string>) {
-    this.set("recipientsList", Value.fromStringArray(value));
+  set receivedAddressList(value: Array<Bytes>) {
+    this.set("receivedAddressList", Value.fromBytesArray(value));
   }
 
-  get interestSourceList(): Array<string> {
-    let value = this.get("interestSourceList");
-    return value.toStringArray();
+  get sentAddressList(): Array<Bytes> {
+    let value = this.get("sentAddressList");
+    return value.toBytesArray();
   }
 
-  set interestSourceList(value: Array<string>) {
-    this.set("interestSourceList", Value.fromStringArray(value));
+  set sentAddressList(value: Array<Bytes>) {
+    this.set("sentAddressList", Value.fromBytesArray(value));
   }
 }
 
-export class Source extends Entity {
+export class Loan extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -86,17 +86,17 @@ export class Source extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save Source entity without an ID");
+    assert(id !== null, "Cannot save Loan entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save Source entity with non-string ID. " +
+      "Cannot save Loan entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("Source", id.toString(), this);
+    store.set("Loan", id.toString(), this);
   }
 
-  static load(id: string): Source | null {
-    return store.get("Source", id) as Source | null;
+  static load(id: string): Loan | null {
+    return store.get("Loan", id) as Loan | null;
   }
 
   get id(): string {

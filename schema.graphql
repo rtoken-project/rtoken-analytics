@@ -1,11 +1,16 @@
 type User @entity {
   id: ID!
-  interestEarned: BigInt
-  recipientsList: [ID!]!
-  interestSourceList: [Source!]!
+  totalInterestEarned: BigInt
+  receivedAddressList: [Bytes!]!
+  sentAddressList: [Bytes!]!
+  receivedLoansList: [Loan!] @derivedFrom(field: "to")
+  sentLoansList: [Loan!] @derivedFrom(field: "from")
 }
 
-type Source @entity {
+type Loan @entity {
+  "ID is: <fromAddress>-<toAddress>"
+  from: Bytes!
+  to: Bytes!
   id: ID!
   timeStarted: String!
   interestRateFloor: BigInt!

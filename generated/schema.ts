@@ -136,6 +136,15 @@ export class Loan extends Entity {
     return store.get("Loan", id) as Loan | null;
   }
 
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
   get from(): string {
     let value = this.get("from");
     return value.toString();
@@ -152,15 +161,6 @@ export class Loan extends Entity {
 
   set to(value: string) {
     this.set("to", Value.fromString(value));
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
   }
 
   get timeStarted(): string {

@@ -9,9 +9,9 @@ type User @entity {
 
 type Loan @entity {
   "ID is: <fromAddress>-<toAddress>"
+  id: ID!
   from: User!
   to: User!
-  id: ID!
   timeStarted: String!
   interestRateFloor: BigInt!
   sInternalAmount: BigInt!

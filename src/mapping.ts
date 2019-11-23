@@ -77,9 +77,6 @@ export function handleLoansTransferred(event: LoansTransferred): void {
   let userTo = loadUser(to);
   let receivedAddressList = userTo.receivedAddressList;
 
-  // Load loan entity
-  let loan = loadLoan(from, to, event.block.timestamp.toString());
-
   // Get event details
   let isDistribution = event.params.isDistribution;
   let sInternalAmount = event.params.internalSavingsAmount;
@@ -88,6 +85,14 @@ export function handleLoansTransferred(event: LoansTransferred): void {
     RToken.bind(event.address).ias()
   );
   let exchangeRateStored = iasContract.exchangeRateStored();
+
+  // Load loan entity
+  let loan = loadLoan(
+    from,
+    to,
+    event.block.timestamp.toString(),
+    exchangeRateStored
+  );
 
   // Check if this is a new loan
   let isNewLoan = true;
@@ -111,7 +116,7 @@ export function handleLoansTransferred(event: LoansTransferred): void {
   loan.redeemableAmount = redeemableAmount;
   let newSInternal = loan.sInternalAmount - sInternalAmount;
   if (isDistribution) {
-    let newSInternal = loan.sInternalAmount + sInternalAmount;
+    newSInternal = loan.sInternalAmount + sInternalAmount;
   }
   loan.sInternalAmount = newSInternal;
   loan.save();
@@ -144,7 +149,12 @@ function loadUser(address: String): User | null {
   return entity;
 }
 
-function loadLoan(from: String, to: String, currentTime: String): Loan | null {
+function loadLoan(
+  from: String,
+  to: String,
+  currentTime: String,
+  rate: BigInt
+): Loan | null {
   let loanId = getLoanID(from, to);
   let entity = Loan.load(loanId);
   if (entity == null) {
@@ -152,7 +162,7 @@ function loadLoan(from: String, to: String, currentTime: String): Loan | null {
     entity.from = from;
     entity.to = to;
     entity.timeStarted = currentTime;
-    entity.interestRateFloor = new BigInt(0);
+    entity.interestRateFloor = rate;
     entity.redeemableAmount = new BigInt(0);
     entity.sInternalAmount = new BigInt(0);
   }

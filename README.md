@@ -12,7 +12,7 @@ Current available commands
 import RTokenAnalytics from 'rtoken-analytics'
 
 const rtokenAnalytics = new RTokenAnalytics(
-  interestRate, interestTolerance, network, subgraphID
+  interestRate, interestTolerance, network, subgraphID, subgraphURL
 )
 
 ```
@@ -23,6 +23,7 @@ const rtokenAnalytics = new RTokenAnalytics(
 |`interestTolerance`| | Todo |
 | `network` ||  "mainnet" is supported only |
 |`subgraphID` | | Get the most recent ID on the subgraph page: [mainnet](https://thegraph.com/explorer/subgraph/pi0neerpat/rdai-graph) |
+| `[subgraphURL]` | optional, default: https://api.thegraph.com/subgraphs/id/ | |
 
 
 ## In Development
@@ -96,7 +97,7 @@ This is the suggested method for obtaining the Compound interest rate
 ```js
 import axios from "axios"
 
-const COMPOUND_URL = 'https://api.compound.finance/api/v2/ctoken?addresses[]= ';
+const COMPOUND_URL = 'https://api.compound.finance/api/v2/ctoken?addresses[]=';
 const daiCompoundAddress = '0xf5dce57282a584d2746faf1593d3121fcac444dc';
 
 const getCompoundRate = async () => {

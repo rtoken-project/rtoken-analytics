@@ -1,14 +1,34 @@
+const { execute, makePromise } = require('apollo-link');
+const gql = require('graphql-tag');
+
+const fetch = require('node-fetch');
+const { createHttpLink } = require('apollo-link-http');
 require('babel-polyfill');
 const ethers = require('ethers');
 
 const { parseUnits, bigNumberify, formatUnits } = ethers.utils;
 
+const DEFAULT_SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/id/';
+
 class RTokenAnalytics {
-  constructor(interestRate, interestTolerance, network, subgraphID) {
+  constructor(
+    interestRate,
+    interestTolerance,
+    network,
+    subgraphID,
+    subgraphURL
+  ) {
     this.interestRate = interestRate;
     this.interestTolerance = interestTolerance;
     this.network = network;
-    this.subgraphID = subgraphID;
+
+    let uri = DEFAULT_SUBGRAPH_URL;
+    if (subgraphURL) uri = subgraphURL;
+
+    this.link = new createHttpLink({
+      uri: `${uri}${subgraphID}`,
+      fetch: fetch
+    });
   }
 
   // --------------------------
@@ -22,6 +42,7 @@ class RTokenAnalytics {
   _calculateSomething() {
     return {};
   }
+
   // --------------------------
   // External functions -  general
 
@@ -76,8 +97,26 @@ class RTokenAnalytics {
 
   // Returns list of addresses that an address has sent interest to
   getAllRecipients(address, [timePeriod]) {
-    // TODO:
-    return {};
+    const operation = {
+      query: gql`
+        query {
+          user(id: "0x0006e4548aed4502ec8c844567840ce6ef1013f5") {
+            id
+            sentAddressList
+          }
+        }
+      `,
+      variables: {}, //optional
+      operationName: {}, //optional
+      context: {}, //optional
+      extensions: {} //optional
+    };
+
+    makePromise(execute(link, operation))
+      .then(data =>
+        console.log(`received data ${JSON.stringify(data, null, 2)}`)
+      )
+      .catch(error => console.log(`received error ${error}`));
   }
 
   // SENDING / RECEIVING

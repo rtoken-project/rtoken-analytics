@@ -12,7 +12,7 @@ Current available commands
 import RTokenAnalytics from 'rtoken-analytics'
 
 const rtokenAnalytics = new RTokenAnalytics(
-  interestRate, interestTolerance, network, subGraphID
+  interestRate, interestTolerance, network, subgraphID
 )
 
 ```
@@ -92,8 +92,10 @@ return {
 
 #### Get Interest Rate
 
-This is the suggested method for obtaining the compound interest rate
+This is the suggested method for obtaining the Compound interest rate
 ```js
+import axios from "axios"
+
 const COMPOUND_URL = 'https://api.compound.finance/api/v2/ctoken?addresses[]= ';
 const daiCompoundAddress = '0xf5dce57282a584d2746faf1593d3121fcac444dc';
 
@@ -110,15 +112,15 @@ const getCompoundRate = async () => {
 
 // Usage
 
-const { compoundRate, compoundRateFormatted } = getCompoundRate();
-// now you can do
-console.log(`Compound Rate: ${compoundRateFormatted}%`)
+const { compoundRate, compoundRateFormatted } = await getCompoundRate();
 
-// As the API can be slow, we recommend saving the rate for quick reference
+console.log(`Compound Rate: ${compoundRateFormatted}%`)
+// > Compound Rate: 4.56%
+
+// We recommend saving the rate for quick reference, as the API can be slow.
 if (typeof window !== 'undefined') {
   localStorage.setItem('compoundRate', compoundRate);
 }
-//
 
 ```
 

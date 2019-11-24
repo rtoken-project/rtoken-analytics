@@ -1,5 +1,26 @@
 const Registry = require('eth-registry');
-const Web3 = require('web3');
+
+const COMPOUND_URL = 'https://api.compound.finance/api/v2/ctoken?addresses[]= ';
+const daiCompoundAddress = '0xf5dce57282a584d2746faf1593d3121fcac444dc';
+
+const getCompoundRate = async () => {
+  const res = await axios.get(`${COMPOUND_URL}${daiCompoundAddress}`);
+
+  const compoundRate = res.data.cToken[0].supply_rate.value;
+  const compoundRateFormatted = Math.round(compoundRate * 10000) / 100;
+  // As the API can be slow, use this to save for quick reference
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('compoundRate', compoundRate);
+  }
+  return {
+    compoundRate,
+    compoundRateFormatted
+  };
+};
+
+// Usage
+
+const { compoundRate, compoundRateFormatted } = getCompoundRate();
 
 // Dependencies
 const _ = require('lodash');
@@ -216,4 +237,3 @@ app.listen(app.get('port'), () => {
 
 //allows export app to server.test.js
 module.exports = { app };
-

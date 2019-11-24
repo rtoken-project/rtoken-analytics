@@ -2,22 +2,27 @@
 
 Using TheGraph ([see deployed subgraph](https://thegraph.com/explorer/subgraph/pi0neerpat/rdai-graph)) and Express to create a REST API.
 
-## API
+## Usage
 
 Current available commands
 
-#### Constructor
+#### Initialize
 
 ```js
-constructor(interestRate, interestTolerance, network, subGraphID);
+import RTokenAnalytics from 'rtoken-analytics'
+
+const rtokenAnalytics = new RTokenAnalytics(
+  interestRate, interestTolerance, network, subGraphID
+)
+
 ```
 
 | Args | Options | Notes|
 |:---:|---|---|
-|`interestRate` | | current interest rate. You can use `getInterestRate()` to get this.
+|`interestRate` | | Current rToken interest rate. See [Get Interest Rate](#get-interest-rate) for details
 |`interestTolerance`| | Todo |
 | `network` ||  "mainnet" is supported only |
-|`subgraphID` | | Get the latest ID on the subgraph page [here](https://thegraph.com/explorer/subgraph/pi0neerpat/rdai-graph) |
+|`subgraphID` | | Get the most recent ID on the subgraph page: [mainnet](https://thegraph.com/explorer/subgraph/pi0neerpat/rdai-graph) |
 
 
 ## In Development
@@ -25,9 +30,6 @@ constructor(interestRate, interestTolerance, network, subGraphID);
 #### General
 
 ```js
-getInterestRate();
-// Returns the current interest rate from Compound
-
 estimatePrincipalRequired(payout, frequency, [inflationRate]);
 // Estimates principal required to generate a specific annuity.
 
@@ -86,6 +88,38 @@ return {
   // Amount of balance change
   // Transaction Hash
 };
+```
+
+#### Get Interest Rate
+
+This is the suggested method for obtaining the compound interest rate
+```js
+const COMPOUND_URL = 'https://api.compound.finance/api/v2/ctoken?addresses[]= ';
+const daiCompoundAddress = '0xf5dce57282a584d2746faf1593d3121fcac444dc';
+
+const getCompoundRate = async () => {
+  const res = await axios.get(`${COMPOUND_URL}${daiCompoundAddress}`);
+  const compoundRate = res.data.cToken[0].supply_rate.value;
+  const compoundRateFormatted = Math.round(compoundRate * 10000) / 100;
+
+  return {
+    compoundRate,
+    compoundRateFormatted
+  };
+};
+
+// Usage
+
+const { compoundRate, compoundRateFormatted } = getCompoundRate();
+// now you can do
+console.log(`Compound Rate: ${compoundRateFormatted}%`)
+
+// As the API can be slow, we recommend saving the rate for quick reference
+if (typeof window !== 'undefined') {
+  localStorage.setItem('compoundRate', compoundRate);
+}
+//
+
 ```
 
 ## Subgraph

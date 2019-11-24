@@ -3,6 +3,7 @@ const ethers = require('ethers');
 const RTokenAnalytics = require('../src/RTokenAnalytics');
 const Registry = require('eth-registry');
 var test = require('mocha').describe;
+var assert = require('chai').assert;
 
 const COMPOUND_URL = 'https://api.compound.finance/api/v2/ctoken?addresses[]=';
 const daiCompoundAddress = '0xf5dce57282a584d2746faf1593d3121fcac444dc';
@@ -28,8 +29,8 @@ test('Test RTokenAnalytics', async accounts => {
 
   describe('Test RTokenAnalytics', async () => {
     it('getAllRecipients()', async () => {
-      let recipients = rtokenAnalytics.getAllRecipients(userA);
-      assert.isOk(recipients, 'no recipients');
+      let recipients = await rtokenAnalytics.getAllRecipients(userA);
+      assert.isAbove(recipients.length, 0, 'no recipients were returned');
     });
   });
 });

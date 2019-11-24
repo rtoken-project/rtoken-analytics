@@ -96,7 +96,7 @@ class RTokenAnalytics {
   }
 
   // Returns list of addresses that an address has sent interest to
-  getAllRecipients(address, [timePeriod]) {
+  async getAllRecipients(address, timePeriod) {
     const operation = {
       query: gql`
         query {
@@ -111,12 +111,8 @@ class RTokenAnalytics {
       context: {}, //optional
       extensions: {} //optional
     };
-
-    makePromise(execute(link, operation))
-      .then(data =>
-        console.log(`received data ${JSON.stringify(data, null, 2)}`)
-      )
-      .catch(error => console.log(`received error ${error}`));
+    let res = await makePromise(execute(this.link, operation));
+    return res.data.user.sentAddressList;
   }
 
   // SENDING / RECEIVING

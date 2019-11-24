@@ -5,6 +5,11 @@ const Registry = require('eth-registry');
 var test = require('mocha').describe;
 var assert = require('chai').assert;
 
+const debug = {
+  hardCodeInterestRate: '0.048356383475363732'
+  // hardCodeInterestRate: false
+};
+
 const COMPOUND_URL = 'https://api.compound.finance/api/v2/ctoken?addresses[]=';
 const daiCompoundAddress = '0xf5dce57282a584d2746faf1593d3121fcac444dc';
 
@@ -14,7 +19,11 @@ test('Test RTokenAnalytics', async accounts => {
   let rtokenAnalytics;
 
   before(async () => {
-    const { compoundRate } = await getCompoundRate();
+    let compoundRate = debug.hardCodeInterestRate;
+    if (!debug.hardCodeInterestRate) {
+      compoundRate = await getCompoundRate();
+    }
+
     const interestTolerance = 0;
     const network = 'mainnet';
     const subgraphID = 'QmUvzSkNe6R7po8EfVfCvpqhkreSN9oE1z8XqXzD1bEzr8';

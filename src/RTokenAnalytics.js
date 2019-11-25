@@ -152,7 +152,7 @@ class RTokenAnalytics {
   }
 
   // Returns total amount of interest received by an address from a single address
-  async getInterestSentByAddress(addressFrom, addressTo, timePeriod) {
+  async getInterestSent(addressFrom, addressTo, timePeriod) {
     const loanID = `${addressFrom}-${addressTo}`;
     const operation = {
       query: gql`

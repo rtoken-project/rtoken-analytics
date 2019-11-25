@@ -8,8 +8,13 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "setEnvironmentProd": "",
-    "test": "SUBGRAPH_ID=$npm_package_subgraph_mainnet_id SUBGRAPH_URL=$npm_package_subgraph_mainnet_url mocha --timeout 7000 "
+    "setup_subgraph_local": "cd subgraph && yarn && yarn codegen && yarn create-local && yarn deploy-local",
+    "set_Env": "SUBGRAPH_ID=$npm_package_subgraph_mainnet_id SUBGRAPH_URL=$npm_package_subgraph_mainnet_url",
+    "start_ganache": "ganache-cli -h 0.0.0.0",
+    "deploy_contracts": "truffle compile && truffle migrate",
+    "start_graph_node": "docker-compose up",
+    "test_local": "start_ganache && truffle_compile && start_graph_node && SUBGRAPH_ID=$npm_package_subgraph_local_id SUBGRAPH_URL=$npm_package_subgraph_local_url mocha --timeout 7000",
+    "test": "SUBGRAPH_ID=$npm_package_subgraph_mainnet_id SUBGRAPH_URL=$npm_package_subgraph_mainnet_url mocha --timeout 7000"
   },
   "subgraph": {
     "mainnet": {

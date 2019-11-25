@@ -30,6 +30,31 @@ https://github.com/sablierhq/sablier-subgraph/blob/master/subgraph.template.yaml
 Auto-deploy subgraph
 https://github.com/sablierhq/sablier-subgraph/blob/master/.github/workflows/deploy.yml
 
+## Subgraph local development
+
+### Set-up:
+
+:warning: This is not recommended if you are unfamiliar with The Graph or GraphQL. We recommend familiarizing yourself with the production/mainnet version of this utility before attempting to develop locally.
+
+1. Install The Graph cli and local. See the Local Development section [here](https://thegraph.com/docs/quick-start#local-development)
+   Authorize yourself using TheGraph
+
+2. Install and deploy the subgraph to your local instance
+
+```
+yarn setup_subgraph_local
+```
+
+###
+
+1. Start Ganache.
+2. Deploy contracts.
+
+- Add contract to schema.graphql
+- Add user address to `test/rtokenAnalytics.test.js`
+
+3. Start
+
 ## Discussion on loan tracking with Miao
 
 Question: How much interest (rDAI/DAI, what if it is cDAI) Alice has earned thanks to Bob?

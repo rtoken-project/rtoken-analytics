@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 description: Tracking interest on rDAI (mainnet)
-repository: https;//github.com/send-tribute/rdai-graph
+repository: https;//github.com/rtoken-project/rtoken-analytics
 schema:
   file: ./schema.graphql
 dataSources:

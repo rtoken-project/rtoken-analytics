@@ -1,14 +1,25 @@
 {
   "name": "rtoken-analytics",
   "version": "0.0.5",
-  "description": "Data and analytics for rToken",
+  "description": "Data and analytics utility for rToken",
   "main": "index.js",
   "repository": "git@github.com:rtoken-project/rtoken-analytics.git",
   "author": "Patrick Gallagher <blockchainbuddha@gmail.com>",
   "license": "MIT",
   "private": false,
   "scripts": {
-    "test": "mocha --timeout 15000"
+    "setEnvironmentProd": "",
+    "test": "SUBGRAPH_ID=$npm_package_subgraph_mainnet_id SUBGRAPH_URL=$npm_package_subgraph_mainnet_url mocha --timeout 7000 "
+  },
+  "subgraph": {
+    "mainnet": {
+      "url": "https://api.thegraph.com/subgraphs/id/",
+      "id": "QmUvzSkNe6R7po8EfVfCvpqhkreSN9oE1z8XqXzD1bEzr8"
+    },
+    "local": {
+      "url": "",
+      "id": ""
+    }
   },
   "dependencies": {
     "apollo-link": "^1.2.13",

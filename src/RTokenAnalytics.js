@@ -8,7 +8,7 @@ const ethers = require('ethers');
 
 const { parseUnits, bigNumberify, formatUnits } = ethers.utils;
 
-const DEFAULT_SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/id/';
+const DEFAULT_SUBGRAPH_URL = process.env.SUBGRAPH_URL;
 
 class RTokenAnalytics {
   constructor(
@@ -24,7 +24,6 @@ class RTokenAnalytics {
 
     let uri = DEFAULT_SUBGRAPH_URL;
     if (subgraphURL) uri = subgraphURL;
-
     this.link = new createHttpLink({
       uri: `${uri}${subgraphID}`,
       fetch: fetch

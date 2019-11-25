@@ -98,20 +98,34 @@ class RTokenAnalytics {
   async getAllRecipients(address, timePeriod) {
     const operation = {
       query: gql`
-        query {
-          user(id: "0x0006e4548aed4502ec8c844567840ce6ef1013f5") {
+        query getUser($id: Bytes) {
+          user(id: $id) {
             id
             sentAddressList
           }
         }
       `,
-      variables: {}, //optional
-      operationName: {}, //optional
-      context: {}, //optional
-      extensions: {} //optional
+      variables: { id: address }
     };
     let res = await makePromise(execute(this.link, operation));
     return res.data.user.sentAddressList;
+  }
+
+  // Returns list of addresses that have sent any interest to this address, and the amounts
+  async getAllSenders(address, timePeriod) {
+    const operation = {
+      query: gql`
+        query getUser($id: Bytes) {
+          user(id: $id) {
+            id
+            receivedAddressList
+          }
+        }
+      `,
+      variables: { id: address }
+    };
+    let res = await makePromise(execute(this.link, operation));
+    return res.data.user.receivedAddressList;
   }
 
   // SENDING / RECEIVING
@@ -125,12 +139,6 @@ class RTokenAnalytics {
 
   // Returns total amount of interest received by an address from a single address
   getInterestSentByAddress(addressFrom, addressTo, [timePeriod]) {
-    // TODO:
-    return {};
-  }
-
-  // Returns list of addresses that have sent any interest to this, and the amounts
-  getAllPayers(address, [timePeriod]) {
     // TODO:
     return {};
   }

@@ -14,6 +14,8 @@ const COMPOUND_URL = 'https://api.compound.finance/api/v2/ctoken?addresses[]=';
 const daiCompoundAddress = '0xf5dce57282a584d2746faf1593d3121fcac444dc';
 
 const userA = '0x0006e4548aed4502ec8c844567840ce6ef1013f5';
+const userB = '0x5d7d257d97d8a81f51187a77c6dd226fb8424d90';
+
 const interestTolerance = 0;
 const network = 'mainnet';
 const subgraphURL = process.env.SUBGRAPH_URL;
@@ -40,6 +42,10 @@ test('Test RTokenAnalytics', async accounts => {
     it('getAllRecipients()', async () => {
       let recipients = await rtokenAnalytics.getAllRecipients(userA);
       assert.isAbove(recipients.length, 0, 'no recipients were returned');
+    });
+    it('getAllSenders()', async () => {
+      let senders = await rtokenAnalytics.getAllSenders(userB);
+      assert.isAbove(senders.length, 0, 'no recipients were returned');
     });
   });
 });

@@ -55,6 +55,15 @@ test('Test RTokenAnalytics', async accounts => {
     let interest = new BigNumber(totalInterestPaid);
     assert.isOk(interest.isGreaterThan(0), 'no interest has been paid');
   });
+
+  it('getInterestSentByAddress()', async () => {
+    let totalInterestPaid = await rtokenAnalytics.getInterestSentByAddress(
+      userA,
+      userB
+    );
+    let interest = new BigNumber(totalInterestPaid);
+    assert.isOk(interest.isGreaterThan(0), 'no interest has been paid');
+  });
 });
 
 const getCompoundRate = async () => {

@@ -152,9 +152,21 @@ class RTokenAnalytics {
   }
 
   // Returns total amount of interest received by an address from a single address
-  getInterestSentByAddress(addressFrom, addressTo, [timePeriod]) {
-    // TODO:
-    return {};
+  async getInterestSentByAddress(addressFrom, addressTo, timePeriod) {
+    const loanID = `${addressFrom}-${addressTo}`;
+    const operation = {
+      query: gql`
+        query($id: Bytes) {
+          loan(id: $id) {
+            id
+            sInternalAmount
+          }
+        }
+      `,
+      variables: { id: loanID }
+    };
+    let res = await makePromise(execute(this.link, operation));
+    return res.data.loan.sInternalAmount;
   }
 
   // GLOBAL

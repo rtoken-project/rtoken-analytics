@@ -83,9 +83,23 @@ class RTokenAnalytics {
   }
 
   // Returns all accrued interest retained by the wallet
-  getTotalInterestRetained(address, [timePeriod]) {
-    // TODO:
-    return {};
+  //TODO
+
+  // Returns all interest paid to the user
+  async getTotalInterestPaid(address, timePeriod) {
+    const operation = {
+      query: gql`
+        query getUser($id: Bytes) {
+          user(id: $id) {
+            id
+            totalInterestPaid
+          }
+        }
+      `,
+      variables: { id: address }
+    };
+    let res = await makePromise(execute(this.link, operation));
+    return res.data.user.totalInterestPaid;
   }
 
   // Returns all interest sent to wallets other than the user’s

@@ -1,6 +1,6 @@
 type User @entity {
   id: ID!
-  totalInterestEarned: BigInt
+  totalInterestPaid: BigInt!
   receivedAddressList: [Bytes!]!
   sentAddressList: [Bytes!]!
   receivedLoansList: [Loan!] @derivedFrom(field: "to")

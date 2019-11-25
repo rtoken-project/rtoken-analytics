@@ -17,7 +17,7 @@ import { User, Loan } from '../generated/schema';
 export function handleInterestPaid(event: InterestPaid): void {
   let entity = loadUser(event.transaction.from.toHex());
 
-  // entity.interestEarned = entity.interestEarned + event.params.amount;
+  entity.totalInterestPaid = entity.totalInterestPaid + event.params.amount;
 
   // Check if interest was earned by self-hat
 
@@ -141,7 +141,7 @@ function loadUser(address: String): User | null {
 
   if (entity == null) {
     entity = new User(address);
-    entity.totalInterestEarned = new BigInt(0);
+    entity.totalInterestPaid = new BigInt(0);
     entity.receivedAddressList = [];
     entity.sentAddressList = [];
   }

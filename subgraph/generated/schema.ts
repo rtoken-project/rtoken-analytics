@@ -42,21 +42,13 @@ export class User extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get totalInterestEarned(): BigInt | null {
-    let value = this.get("totalInterestEarned");
-    if (value === null) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+  get totalInterestPaid(): BigInt {
+    let value = this.get("totalInterestPaid");
+    return value.toBigInt();
   }
 
-  set totalInterestEarned(value: BigInt | null) {
-    if (value === null) {
-      this.unset("totalInterestEarned");
-    } else {
-      this.set("totalInterestEarned", Value.fromBigInt(value as BigInt));
-    }
+  set totalInterestPaid(value: BigInt) {
+    this.set("totalInterestPaid", Value.fromBigInt(value));
   }
 
   get receivedAddressList(): Array<Bytes> {

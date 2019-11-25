@@ -14,7 +14,7 @@
   "subgraph": {
     "mainnet": {
       "url": "https://api.thegraph.com/subgraphs/id/",
-      "id": "QmUvzSkNe6R7po8EfVfCvpqhkreSN9oE1z8XqXzD1bEzr8"
+      "id": "QmTvQvpuFAeBYpuMUGs2yRrqZj92YFiDymWD8eZ7AduA5r"
     },
     "local": {
       "url": "",
@@ -25,6 +25,7 @@
     "apollo-link": "^1.2.13",
     "apollo-link-http": "^1.5.16",
     "axios": "^0.19.0",
+    "bignumber": "^1.1.0",
     "chai": "^4.2.0",
     "eth-registry": "^1.2.0",
     "ethers": "^4.0.40",

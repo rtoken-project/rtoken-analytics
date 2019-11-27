@@ -30,14 +30,48 @@ https://github.com/sablierhq/sablier-subgraph/blob/master/subgraph.template.yaml
 Auto-deploy subgraph
 https://github.com/sablierhq/sablier-subgraph/blob/master/.github/workflows/deploy.yml
 
-## Subgraph local development
+## Deploying to a local environment
+
+> :warning: You probably don't need to do this! If your rToken is deployed to `Mainnet` or `Ropsten`, then you should use the hosted servers provided by The Graph.
+
+The rToken team uses a local subgraph deployment to enable rapid development and testing of the tools provided here. Before continuing, you should be familiar with creating a subgraph and using GraphQL.
+
+In this section we will provide instructions for the following:
+
+1. Deploy the rToken-Analytics subgraph to a local docker container on your machine.
+2. Deploy the contracts to a local Ganache instance.
+3. Run tests to ensure your setup is complete.
 
 ### Set-up:
 
-:warning: This is not recommended if you are unfamiliar with The Graph or GraphQL. We recommend familiarizing yourself with the production/mainnet version of this utility before attempting to develop locally.
+If you get stuck, see additional instructions from The Graph docs [here](https://thegraph.com/docs/quick-start#local-development).
 
-1. Install The Graph cli and local. See the Local Development section [here](https://thegraph.com/docs/quick-start#local-development)
-   Authorize yourself using TheGraph
+Install dependencies
+
+```bash
+sudo apt install docker
+yarn global add truffle ganache-cli
+```
+
+Start running ganache-cli
+
+```bash
+ganache-cli -h 0.0.0.0
+```
+
+Download `graph-node` Docker file
+
+```bash
+git clone https://github.com/graphprotocol/graph-node/
+cd graph-node/docker
+```
+
+If on Linux, run the following script. Note I had problems here, so you may need to troubleshoot by first running `docker-compose create` or `docker-compose up`. If you get a "version" error, update your docker-compose with [these instructions](https://docs.docker.com/compose/install/).
+
+```bash
+sudo apt install jq docker-compose
+./setup.sh
+```
 
 2. Install and deploy the subgraph to your local instance
 

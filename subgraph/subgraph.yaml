@@ -7,8 +7,10 @@ dataSources:
   - kind: ethereum/contract
     name: RToken
     network: mainnet
+    # network: local
     source:
-      address: '0xea8b224eDD3e342DEb514C4176c2E72Bcce6fFF9'
+      # address: '0xea8b224eDD3e342DEb514C4176c2E72Bcce6fFF9'
+      address: '0x68078D223678A257302c9c99F2E4bF4FE8ec7dF3'
       abi: RToken
     mapping:
       kind: ethereum/events

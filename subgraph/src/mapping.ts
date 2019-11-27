@@ -14,6 +14,9 @@ import {
 import { CompoundAllocationStrategy } from '../generated/RToken/CompoundAllocationStrategy';
 import { User, Loan } from '../generated/schema';
 
+// TODO: Add global stats to track total rDAI interest sent to an external account
+// TODO: remove general functions
+
 export function handleInterestPaid(event: InterestPaid): void {
   let entity = loadUser(event.transaction.from.toHex());
 

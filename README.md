@@ -149,20 +149,15 @@ The rToken team uses a local subgraph deployment to enable rapid development and
 
 ### Setup a local subgraph
 
-If you get stuck, see additional instructions from The Graph docs [here](https://thegraph.com/docs/quick-start#local-development).
+> If you've already performed the setup process, you should skip down to the [Testing and restarting](#Testing-and-restarting) section.
 
-Install dependencies
+If you get stuck during setup, see additional instructions from The Graph docs [here](https://thegraph.com/docs/quick-start#local-development).
+
+First install the dependencies
 
 ```bash
-sudo apt install docker
+sudo apt install docker docker-compose
 yarn global add truffle ganache-cli @graphprotocol/graph-cli
-```
-
-Start running ganache-cli (yes, we need to do this before starting docker)
-
-```bash
-ganache-cli -h 0.0.0.0 -m sweet
-# The mnemonic ensures addresses stay the same each time ganache starts.
 ```
 
 Download the `graph-node` Docker instance.
@@ -175,27 +170,34 @@ cd graph-node/docker
 If on Linux, run the following script. Note I had problems here, so you may need to troubleshoot by first running `docker-compose create` or `docker-compose up`. If you get a "version" error, update your docker-compose with [these instructions](https://docs.docker.com/compose/install/). If you get an error like `ERROR: could not find an available, non-overlapping IPv4 address...` then take off your tin-foil hat and stop running OpenVPN, or follow [this tutorial](https://stackoverflow.com/questions/45692255/how-make-openvpn-work-with-docker).
 
 ```bash
-sudo apt install jq docker-compose
+sudo apt install jq # if necessary
 ./setup.sh
 ```
 
 Now lets start our subgraph Docker instance.
 
-> Note: Each time you restart ganache, you must first delete the postgres database with `rm -rf data/postgres` in the docker folder.
-
 ```bash
 docker-compose up
+# leave running
 ```
 
-Now we must fetch the latest contracts from the `rtoken-contracts` repo, and deploy them to ganache.
+In a new terminal, switch back to the `rtoken-analytics` repo, and start running ganache-cli.
 
 ```bash
-# TODO: check is correct
-# TODO: add fetch contract script
-yarn deploy_contracts_subgraph
+yarn start_ganache
+# leave running
 ```
 
-You should see the deployed rToken address is `0x68078D223678A257302c9c99F2E4bF4FE8ec7dF3`. Before deploying the subgraph to your docker instance, check that the address in `/subgraph/subgraph.yaml` matches the above.
+In a new terminal, we can fetch the latest contracts from the `rtoken-contracts` repo, and deploy them to ganache.
+
+```bash
+yarn fetch_contracts
+yarn deploy_contracts
+```
+
+The address in `rtoken-analytics/subgraph/subgraph.yaml` should be automatically updated during the previous step. Before proceeding, check that the deployed rToken address printed at the start of the deployment process matches the one shown in the .yaml file.
+
+We are now ready to deploy our subgraph.
 
 ```bash
 cd subgraph

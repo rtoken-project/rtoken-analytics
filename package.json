@@ -10,6 +10,7 @@
   "scripts": {
     "setup_subgraph_local": "cd subgraph && yarn && yarn codegen && yarn create-local && yarn deploy-local",
     "start_ganache": "ganache-cli -h 0.0.0.0 -m sweet",
+    "fetch_contracts": " ",
     "deploy_contracts": "truffle test --network subgraphDev test/deployContracts.js",
     "update_yaml": "",
     "deploy_subgraph": "cd subgraph && yarn create-local && yarn deploy-local --watch",

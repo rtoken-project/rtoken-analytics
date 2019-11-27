@@ -21,7 +21,7 @@
       "id": "QmTvQvpuFAeBYpuMUGs2yRrqZj92YFiDymWD8eZ7AduA5r"
     },
     "local": {
-      "url": "",
+      "url": "http://localhost:8000/subgraphs/name/rtoken-project/rtoken-analytics",
       "id": ""
     }
   },

@@ -30,54 +30,10 @@ class RTokenAnalytics {
     });
   }
 
-  // --------------------------
-  // Async internal functions
-  async get_SOMETHING() {
-    return {};
-  }
-
-  // --------------------------
-  // Synchronous internal functions
-  _calculateSomething() {
-    return {};
-  }
-
-  // --------------------------
-  // External functions -  general
-
-  // Estimates principal required to generate a specific annuity (e.g. $1,000 to generate $1/month)
-  estimatePrincipalRequired(payout, frequency, [inflationRate]) {
-    // TODO
-    return {};
-  }
-
-  // Estimate amount of rToken that will be generated over specified time period
-  estimateFutureInterestGenerated(principal, timePeriod) {
-    // TODO:
-    return {};
-  }
-
-  // TODO: Future value of annuity
-  // Gets the estimated total of rToken in the future, when you contribute on a regular basis.
-
-  // TODO: Present value of annuity
-  // How much do I need to contribute every year to reach a specific goal?
-
-  // TODO: Present value
-  // How much do I need to contribute now, with no additional contributions, to reach a specific goal?
-
-  // TODO: Withdrawal calculator
-  // How much do I need to contribute now, with no additonal contributions, to make monthly withdrawal of X for a specific period of time?
-  // (Number CAN go down)
-  // e.g. $1,000 deposit will allow me to buy a $3 coffee every week for 7 years. At the end of 7 years I will have $0, and will have saved $X
-
-  // --------------------------
-  // External functions - TheGraph
-
   // USER STATS
 
   // Returns all interest accrued within time period no matter where it was sent
-  getTotalInterestGenerated(address, [timePeriod]) {
+  getTotalInterestGenerated(address, timePeriod) {
     // TODO:
     return {};
   }
@@ -103,7 +59,7 @@ class RTokenAnalytics {
   }
 
   // Returns all interest sent to wallets other than the user’s
-  getTotalInterestSent(address, [timePeriod]) {
+  getTotalInterestSent(address, timePeriod) {
     // TODO:
     return {};
   }
@@ -146,7 +102,7 @@ class RTokenAnalytics {
 
   // Returns total amount of interest received by an address from all sources
   // Excludes interest generated from user’s own wallet
-  getTotalInterestReceivedExternal(address, [timePeriod]) {
+  getTotalInterestReceivedExternal(address, timePeriod) {
     // TODO:
     return {};
   }
@@ -170,19 +126,19 @@ class RTokenAnalytics {
   }
 
   // GLOBAL
-  getGlobalInterestGenerated([timePeriod]) {
+  getGlobalInterestGenerated(timePeriod) {
     // TODO:
     return {};
   }
 
-  getGlobalInterestSent([timePeriod]) {
+  getGlobalInterestSent(timePeriod) {
     // TODO:
     return {};
   }
 
   // TOKEN BALANCE TRACKING
   // Returns array of objects for each instance that a address’ rToken balance changes. Object returns:
-  getTokenBalanceHistoryByAddress(address, [timePeriod]) {
+  getTokenBalanceHistoryByAddress(address, timePeriod) {
     // TODO
     return {
       // Amount of balance change

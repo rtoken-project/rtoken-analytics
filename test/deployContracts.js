@@ -402,247 +402,247 @@ contract('RToken', accounts => {
     assert.equal(wad4human(await token.balanceOf.call(customer3)), '2.00000');
   });
 
-  it('#3 rToken normal operations with hat', async () => {
-    await web3tx(token.approve, 'token.approve 100 by customer1')(
-      rToken.address,
-      toWad(100),
-      {
-        from: customer1
-      }
-    );
-    await web3tx(
-      rToken.mintWithNewHat,
-      'rToken.mint 100 to customer1 with a hat benefiting admin(90%) and customer2(10%)',
-      {
-        inLogs: [
-          {
-            name: 'Transfer'
-          }
-        ]
-      }
-    )(toWad(100), [admin, customer2], [90, 10], {
-      from: customer1
-    });
-    assert.equal(wad4human(await token.balanceOf.call(customer1)), '900.00000');
-    assert.equal(wad4human(await rToken.totalSupply.call()), '100.00000');
-    assert.deepEqual(parseHat(await rToken.getHatByAddress.call(customer1)), {
-      hatID: 1,
-      recipients: [admin, customer2],
-      proportions: [3865470565, 429496729]
-    });
-    assert.deepEqual(parseHat(await rToken.getHatByAddress.call(admin)), {
-      hatID: 0,
-      recipients: [],
-      proportions: []
-    });
-    assert.deepEqual(parseHat(await rToken.getHatByAddress.call(customer2)), {
-      hatID: 0,
-      recipients: [],
-      proportions: []
-    });
-    assert.deepEqual(parseHatStats(await rToken.getHatStats(1)), {
-      useCount: '1',
-      totalLoans: '100.00000',
-      totalSavings: '100.00000'
-    });
-    await expectAccount(customer1, {
-      tokenBalance: '100.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '0.00000',
-      receivedSavings: '0.00000',
-      interestPayable: '0.00000'
-    });
-    await expectAccount(admin, {
-      tokenBalance: '0.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '90.00000',
-      receivedSavings: '90.00000',
-      interestPayable: '0.00000'
-    });
-    await expectAccount(customer2, {
-      tokenBalance: '0.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '10.00000',
-      receivedSavings: '10.00000',
-      interestPayable: '0.00000'
-    });
-
-    await doBingeBorrowing();
-    assert.equal(wad4human(await rToken.totalSupply.call()), '100.00000');
-    await expectAccount(customer1, {
-      tokenBalance: '100.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '0.00000',
-      receivedSavings: '0.00000',
-      interestPayable: '0.00000'
-    });
-    await expectAccount(admin, {
-      tokenBalance: '0.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '90.00000',
-      receivedSavings: '90.00090',
-      interestPayable: '0.00090'
-    });
-    await expectAccount(customer2, {
-      tokenBalance: '0.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '10.00000',
-      receivedSavings: '10.00010',
-      interestPayable: '0.00010'
-    });
-
-    await web3tx(rToken.redeem, 'rToken.redeem 10 to customer1', {
-      inLogs: [
-        {
-          name: 'Transfer'
-        }
-      ]
-    })(toWad(10), {
-      from: customer1
-    });
-    assert.equal(wad4human(await token.balanceOf.call(customer1)), '910.00000');
-    assert.equal(wad4human(await rToken.totalSupply.call()), '90.00000');
-    await expectAccount(customer1, {
-      tokenBalance: '90.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '0.00000',
-      receivedSavings: '0.00000',
-      interestPayable: '0.00000'
-    });
-    await expectAccount(admin, {
-      tokenBalance: '0.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '81.00000',
-      receivedSavings: '81.00091',
-      interestPayable: '0.00091'
-    });
-    await expectAccount(customer2, {
-      tokenBalance: '0.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '9.00000',
-      receivedSavings: '9.00010',
-      interestPayable: '0.00010'
-    });
-
-    await web3tx(rToken.transfer, 'rToken.transfer 10 customer1 -> customer3', {
-      inLogs: [
-        {
-          name: 'Transfer'
-        }
-      ]
-    })(customer3, toWad(10), {
-      from: customer1
-    });
-    assert.equal(wad4human(await rToken.totalSupply.call()), '90.00000');
-    assert.deepEqual(parseHat(await rToken.getHatByAddress.call(customer3)), {
-      hatID: 1,
-      recipients: [admin, customer2],
-      proportions: [3865470565, 429496729]
-    });
-    await expectAccount(customer1, {
-      tokenBalance: '80.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '0.00000',
-      receivedSavings: '0.00000',
-      interestPayable: '0.00000'
-    });
-    await expectAccount(admin, {
-      tokenBalance: '0.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '81.00000',
-      receivedSavings: '81.00092',
-      interestPayable: '0.00092'
-    });
-    await expectAccount(customer2, {
-      tokenBalance: '0.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '9.00000',
-      receivedSavings: '9.00010',
-      interestPayable: '0.00010'
-    });
-    await expectAccount(customer3, {
-      tokenBalance: '10.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '0.00000',
-      receivedSavings: '0.00000',
-      interestPayable: '0.00000'
-    });
-
-    assert.equal(wad4human(await rToken.balanceOf(admin)), '0.00000');
-    await web3tx(rToken.payInterest, 'rToken.payInterest to admin', {
-      inLogs: [
-        {
-          name: 'InterestPaid'
-        }
-      ]
-    })(admin, { from: admin });
-    assert.equal(wad4human(await rToken.totalSupply.call()), '90.00093');
-    await expectAccount(customer1, {
-      tokenBalance: '80.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '0.00000',
-      receivedSavings: '0.00000',
-      interestPayable: '0.00000'
-    });
-    await expectAccount(admin, {
-      tokenBalance: '0.00093',
-      cumulativeInterest: '0.00093',
-      receivedLoan: '81.00000',
-      receivedSavings: '81.00093',
-      interestPayable: '0.00000'
-    });
-    await expectAccount(customer2, {
-      tokenBalance: '0.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '9.00000',
-      receivedSavings: '9.00010',
-      interestPayable: '0.00010'
-    });
-    await expectAccount(customer3, {
-      tokenBalance: '10.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '0.00000',
-      receivedSavings: '0.00000',
-      interestPayable: '0.00000'
-    });
-
-    await waitForInterest();
-    assert.equal(wad4human(await rToken.totalSupply.call()), '90.00093');
-    await expectAccount(customer1, {
-      tokenBalance: '80.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '0.00000',
-      receivedSavings: '0.00000',
-      interestPayable: '0.00000'
-    });
-    await expectAccount(admin, {
-      tokenBalance: '0.00093',
-      cumulativeInterest: '0.00093',
-      receivedLoan: '81.00000',
-      receivedSavings: '81.00183',
-      interestPayable: '0.00090'
-    });
-    await expectAccount(customer2, {
-      tokenBalance: '0.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '9.00000',
-      receivedSavings: '9.00020',
-      interestPayable: '0.00020'
-    });
-    await expectAccount(customer3, {
-      tokenBalance: '10.00000',
-      cumulativeInterest: '0.00000',
-      receivedLoan: '0.00000',
-      receivedSavings: '0.00000',
-      interestPayable: '0.00000'
-    });
-
-    assert.deepEqual(parseHatStats(await rToken.getHatStats(1)), {
-      useCount: '2',
-      totalLoans: '90.00000',
-      totalSavings: '90.00203'
-    });
-  });
+  // it('#3 rToken normal operations with hat', async () => {
+  //   await web3tx(token.approve, 'token.approve 100 by customer1')(
+  //     rToken.address,
+  //     toWad(100),
+  //     {
+  //       from: customer1
+  //     }
+  //   );
+  //   await web3tx(
+  //     rToken.mintWithNewHat,
+  //     'rToken.mint 100 to customer1 with a hat benefiting admin(90%) and customer2(10%)',
+  //     {
+  //       inLogs: [
+  //         {
+  //           name: 'Transfer'
+  //         }
+  //       ]
+  //     }
+  //   )(toWad(100), [admin, customer2], [90, 10], {
+  //     from: customer1
+  //   });
+  //   assert.equal(wad4human(await token.balanceOf.call(customer1)), '900.00000');
+  //   assert.equal(wad4human(await rToken.totalSupply.call()), '100.00000');
+  //   assert.deepEqual(parseHat(await rToken.getHatByAddress.call(customer1)), {
+  //     hatID: 1,
+  //     recipients: [admin, customer2],
+  //     proportions: [3865470565, 429496729]
+  //   });
+  //   assert.deepEqual(parseHat(await rToken.getHatByAddress.call(admin)), {
+  //     hatID: 0,
+  //     recipients: [],
+  //     proportions: []
+  //   });
+  //   assert.deepEqual(parseHat(await rToken.getHatByAddress.call(customer2)), {
+  //     hatID: 0,
+  //     recipients: [],
+  //     proportions: []
+  //   });
+  //   assert.deepEqual(parseHatStats(await rToken.getHatStats(1)), {
+  //     useCount: '1',
+  //     totalLoans: '100.00000',
+  //     totalSavings: '100.00000'
+  //   });
+  //   await expectAccount(customer1, {
+  //     tokenBalance: '100.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '0.00000',
+  //     receivedSavings: '0.00000',
+  //     interestPayable: '0.00000'
+  //   });
+  //   await expectAccount(admin, {
+  //     tokenBalance: '0.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '90.00000',
+  //     receivedSavings: '90.00000',
+  //     interestPayable: '0.00000'
+  //   });
+  //   await expectAccount(customer2, {
+  //     tokenBalance: '0.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '10.00000',
+  //     receivedSavings: '10.00000',
+  //     interestPayable: '0.00000'
+  //   });
+  //
+  //   await doBingeBorrowing();
+  //   assert.equal(wad4human(await rToken.totalSupply.call()), '100.00000');
+  //   await expectAccount(customer1, {
+  //     tokenBalance: '100.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '0.00000',
+  //     receivedSavings: '0.00000',
+  //     interestPayable: '0.00000'
+  //   });
+  //   await expectAccount(admin, {
+  //     tokenBalance: '0.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '90.00000',
+  //     receivedSavings: '90.00090',
+  //     interestPayable: '0.00090'
+  //   });
+  //   await expectAccount(customer2, {
+  //     tokenBalance: '0.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '10.00000',
+  //     receivedSavings: '10.00010',
+  //     interestPayable: '0.00010'
+  //   });
+  //
+  //   await web3tx(rToken.redeem, 'rToken.redeem 10 to customer1', {
+  //     inLogs: [
+  //       {
+  //         name: 'Transfer'
+  //       }
+  //     ]
+  //   })(toWad(10), {
+  //     from: customer1
+  //   });
+  //   assert.equal(wad4human(await token.balanceOf.call(customer1)), '910.00000');
+  //   assert.equal(wad4human(await rToken.totalSupply.call()), '90.00000');
+  //   await expectAccount(customer1, {
+  //     tokenBalance: '90.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '0.00000',
+  //     receivedSavings: '0.00000',
+  //     interestPayable: '0.00000'
+  //   });
+  //   await expectAccount(admin, {
+  //     tokenBalance: '0.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '81.00000',
+  //     receivedSavings: '81.00091',
+  //     interestPayable: '0.00091'
+  //   });
+  //   await expectAccount(customer2, {
+  //     tokenBalance: '0.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '9.00000',
+  //     receivedSavings: '9.00010',
+  //     interestPayable: '0.00010'
+  //   });
+  //
+  //   await web3tx(rToken.transfer, 'rToken.transfer 10 customer1 -> customer3', {
+  //     inLogs: [
+  //       {
+  //         name: 'Transfer'
+  //       }
+  //     ]
+  //   })(customer3, toWad(10), {
+  //     from: customer1
+  //   });
+  //   assert.equal(wad4human(await rToken.totalSupply.call()), '90.00000');
+  //   assert.deepEqual(parseHat(await rToken.getHatByAddress.call(customer3)), {
+  //     hatID: 1,
+  //     recipients: [admin, customer2],
+  //     proportions: [3865470565, 429496729]
+  //   });
+  //   await expectAccount(customer1, {
+  //     tokenBalance: '80.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '0.00000',
+  //     receivedSavings: '0.00000',
+  //     interestPayable: '0.00000'
+  //   });
+  //   await expectAccount(admin, {
+  //     tokenBalance: '0.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '81.00000',
+  //     receivedSavings: '81.00092',
+  //     interestPayable: '0.00092'
+  //   });
+  //   await expectAccount(customer2, {
+  //     tokenBalance: '0.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '9.00000',
+  //     receivedSavings: '9.00010',
+  //     interestPayable: '0.00010'
+  //   });
+  //   await expectAccount(customer3, {
+  //     tokenBalance: '10.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '0.00000',
+  //     receivedSavings: '0.00000',
+  //     interestPayable: '0.00000'
+  //   });
+  //
+  //   assert.equal(wad4human(await rToken.balanceOf(admin)), '0.00000');
+  //   await web3tx(rToken.payInterest, 'rToken.payInterest to admin', {
+  //     inLogs: [
+  //       {
+  //         name: 'InterestPaid'
+  //       }
+  //     ]
+  //   })(admin, { from: admin });
+  //   assert.equal(wad4human(await rToken.totalSupply.call()), '90.00093');
+  //   await expectAccount(customer1, {
+  //     tokenBalance: '80.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '0.00000',
+  //     receivedSavings: '0.00000',
+  //     interestPayable: '0.00000'
+  //   });
+  //   await expectAccount(admin, {
+  //     tokenBalance: '0.00093',
+  //     cumulativeInterest: '0.00093',
+  //     receivedLoan: '81.00000',
+  //     receivedSavings: '81.00093',
+  //     interestPayable: '0.00000'
+  //   });
+  //   await expectAccount(customer2, {
+  //     tokenBalance: '0.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '9.00000',
+  //     receivedSavings: '9.00010',
+  //     interestPayable: '0.00010'
+  //   });
+  //   await expectAccount(customer3, {
+  //     tokenBalance: '10.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '0.00000',
+  //     receivedSavings: '0.00000',
+  //     interestPayable: '0.00000'
+  //   });
+  //
+  //   await waitForInterest();
+  //   assert.equal(wad4human(await rToken.totalSupply.call()), '90.00093');
+  //   await expectAccount(customer1, {
+  //     tokenBalance: '80.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '0.00000',
+  //     receivedSavings: '0.00000',
+  //     interestPayable: '0.00000'
+  //   });
+  //   await expectAccount(admin, {
+  //     tokenBalance: '0.00093',
+  //     cumulativeInterest: '0.00093',
+  //     receivedLoan: '81.00000',
+  //     receivedSavings: '81.00183',
+  //     interestPayable: '0.00090'
+  //   });
+  //   await expectAccount(customer2, {
+  //     tokenBalance: '0.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '9.00000',
+  //     receivedSavings: '9.00020',
+  //     interestPayable: '0.00020'
+  //   });
+  //   await expectAccount(customer3, {
+  //     tokenBalance: '10.00000',
+  //     cumulativeInterest: '0.00000',
+  //     receivedLoan: '0.00000',
+  //     receivedSavings: '0.00000',
+  //     interestPayable: '0.00000'
+  //   });
+  //
+  //   assert.deepEqual(parseHatStats(await rToken.getHatStats(1)), {
+  //     useCount: '2',
+  //     totalLoans: '90.00000',
+  //     totalSavings: '90.00203'
+  //   });
+  // });
   //
   // it('#4 rToken mint multiple times', async () => {
   //   await web3tx(token.approve, 'token.approve 100 by customer1')(

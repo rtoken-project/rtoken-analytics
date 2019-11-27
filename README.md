@@ -7,7 +7,7 @@ This library provides easy tools for getting data about specific users of rToken
 | Subgraph for rSAI on mainnet  | :hammer_and_wrench: | Redeemable single-collateral DAI [deployed subgraph](https://thegraph.com/explorer/subgraph/pi0neerpat/rdai-graph). Recommend do not use for production until completed. |
 | Subscribe to rToken data in your DAPP  | :hammer_and_wrench: | See `src/RTokenAnalytics.js`|
 | Local subgraph development and testing | :white_check_mark:  | See [Deploying to a local environment](#Deploying-to-a-local-environment)|
-| Bring your own rToken| :hammer_and_wrench:| |
+| Bring-your-own rToken| :hammer_and_wrench:| See [instructions](#bring-your-own-rtoken) |
 | Your suggested feature here | ? | |
 
 ## Usage
@@ -133,19 +133,19 @@ if (typeof window !== 'undefined') {
 
 TODO
 
-## Deploy for a custom token
+## Bring-your-own rToken
+
+
 
 ## Deploying to a local environment
 
 > :warning: You probably don't need to do this! If your rToken is deployed to `Mainnet` or `Ropsten`, then you should use the hosted servers provided by The Graph.
 
-The rToken team uses a local subgraph deployment to enable rapid development and testing of the tools provided here. Before continuing, you should be familiar with creating a subgraph and using GraphQL.
+The rToken team uses a local subgraph deployment to enable rapid development and testing of the tools provided here. In this section we will do the following:
 
-In this section we will provide instructions for the following:
-
-1. Deploy the rToken-Analytics subgraph to a local docker container on your machine.
+1. Deploy the `rtoken-analytics` subgraph to a local docker container on your machine.
 2. Deploy the contracts to a local Ganache instance.
-3. Run tests to ensure your setup is complete.
+3. Check that your setup is operating correctly.
 
 ### Setup a local subgraph
 
@@ -179,7 +179,9 @@ sudo apt install jq docker-compose
 ./setup.sh
 ```
 
-Now lets get things started with
+Now lets start our subgraph Docker instance.
+
+> Note: Each time you restart ganache, you must first delete the postgres database with `rm -rf data/postgres` in the docker folder.
 
 ```bash
 docker-compose up
@@ -192,8 +194,6 @@ Now we must fetch the latest contracts from the `rtoken-contracts` repo, and dep
 # TODO: add fetch contract script
 yarn deploy_contracts_subgraph
 ```
-
-> NOTE: Each time you restart ganache with a fresh network, you must delete the postgres database with `rm -rf data/postgres` in the docker folder.
 
 You should see the deployed rToken address is `0x68078D223678A257302c9c99F2E4bF4FE8ec7dF3`. Before deploying the subgraph to your docker instance, check that the address in `/subgraph/subgraph.yaml` matches the above.
 
@@ -237,6 +237,33 @@ You should get a response like this
                 "sentAddressList": []
             },
             ...
+```
+
+### Testing and restarting
+
+Here are the current steps for re-deploying a subgraph once you've made some changes.
+
+Stop your docker instance, and restart it.
+
+```bash
+sudo rm -rf data # optional, use if you see "Error creating the subgraph: subgraph already exists"
+docker-compose up
+```
+Open a new terminal, at the root directory of this repository.
+
+```bash
+yarn start_ganache
+```
+
+In a new terminal, deploy the contracts and start the automatic re-deployment of a new subgraph, whenever subgraph.yaml is changed.
+```bash
+yarn start_subgraph
+# Leave running
+```
+
+In a new terminal, start the test suite
+```bash
+nodemon -x yarn test_local
 ```
 
 TODO

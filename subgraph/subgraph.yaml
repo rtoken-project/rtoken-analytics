@@ -9,7 +9,7 @@ dataSources:
     network: mainnet
     source:
       # address: '0xea8b224eDD3e342DEb514C4176c2E72Bcce6fFF9'
-      address: '0x68078D223678A257302c9c99F2E4bF4FE8ec7dF3'
+      address: '0xc97EeFc57dD8E74A30AC2cC52E8785B40a14a30c'
       abi: RToken
     mapping:
       kind: ethereum/events

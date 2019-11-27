@@ -22,6 +22,11 @@ const interestTolerance = 0;
 const network = 'mainnet';
 const subgraphURL = process.env.SUBGRAPH_URL;
 const subgraphID = process.env.SUBGRAPH_ID;
+const isLocal = process.env.LOCAL
+
+console.log(subgraphURL);
+console.log(subgraphID);
+console.log(isLocal);
 
 test('Test RTokenAnalytics', async accounts => {
   let rtokenAnalytics;

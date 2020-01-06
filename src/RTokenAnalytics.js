@@ -10,25 +10,20 @@ const BigNumber = require('bignumber.js');
 
 const { parseUnits, bigNumberify, formatUnits } = ethers.utils;
 
-const DEFAULT_SUBGRAPH_URL = process.env.SUBGRAPH_URL;
+const DEFAULT_SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/id/';
+const DEFAULT_SUBGRAPH_ID = 'QmfUZ16H2GBxQ4eULAELDJjjVZcZ36TcDkwhoZ9cjF2WNc';
 
 class RTokenAnalytics {
-  constructor(
-    interestRate,
-    interestTolerance,
-    network,
-    subgraphID,
-    subgraphURL
-  ) {
-    this.interestRate = interestRate;
-    this.interestTolerance = interestTolerance;
-    this.network = network;
-
-    let uri = subgraphURL ? subgraphURL : DEFAULT_SUBGRAPH_URL;
+  constructor(options = {}) {
+    this.interestRate = options.interestRate || 0; // Currently unused
+    this.interestTolerance = options.interestTolerance || 0; // Currently unused
+    const uri = options.subgraphURL || DEFAULT_SUBGRAPH_URL;
+    const id = options.subgraphID || DEFAULT_SUBGRAPH_ID;
     this.link = new createHttpLink({
-      uri: `${uri}${subgraphID}`,
+      uri: `${uri}${id}`,
       fetch: fetch
     });
+    console.log(uri);
   }
 
   // USER STATS
@@ -212,7 +207,6 @@ class RTokenAnalytics {
           value = value.plus(transfer.value);
         });
       }
-      return;
     });
     return interestSent;
   }

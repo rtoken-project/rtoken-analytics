@@ -17,7 +17,7 @@ const daiCompoundAddress = '0xf5dce57282a584d2746faf1593d3121fcac444dc';
 // NOTE: change these if you are using a custom rToken (e.g. not rDAI)
 // A should be sending interest to B
 const userA = '0x9492510bbcb93b6992d8b7bb67888558e12dcac4';
-const userB = '0x358f6260f1f90cd11a10e251ce16ea526f131b02';
+const userB = '0x8605e554111d8ea3295e69addaf8b2abf60d68a3';
 
 const interestTolerance = 0;
 const network = 'mainnet';
@@ -40,29 +40,29 @@ test('RTokenAnalytics', async accounts => {
       'Local test:   ',
       typeof isLocal === 'undefined' ? false : true
     );
-
-    rtokenAnalytics = new RTokenAnalytics(
-      compoundRate,
-      interestTolerance,
-      network,
+    const options = {
+      interestRate: compoundRate, // Currently unused
+      interestTolerance, // Currently unused
       subgraphID,
       subgraphURL
-    );
+    };
+    rtokenAnalytics = new RTokenAnalytics(options);
   });
 
-  // it('getAllOutgoing()', async () => {
-  //   let outgoing = await rtokenAnalytics.getAllOutgoing(userA);
-  //   assert.isAbove(outgoing.length, 0, 'no outgoing were returned');
-  // });
-  //
-  // it('getAllIncoming()', async () => {
-  //   let incoming = await rtokenAnalytics.getAllIncoming(userB);
-  //   assert.isAbove(incoming.length, 0, 'no incoming were returned');
-  // });
+  it('getAllOutgoing()', async () => {
+    let outgoing = await rtokenAnalytics.getAllOutgoing(userA);
+    assert.isAbove(outgoing.length, 0, 'no outgoing were returned');
+  });
+
+  it('getAllIncoming()', async () => {
+    let incoming = await rtokenAnalytics.getAllIncoming(userB);
+    assert.isAbove(incoming.length, 0, 'no incoming were returned');
+  });
 
   it('getInterestSent()', async () => {
     let interestSent = await rtokenAnalytics.getInterestSent(userA, userB);
     let interest = new BigNumber(interestSent);
+    console.log(interest.toNumber());
     assert.isOk(interest.isGreaterThan(0), 'no interest has been paid');
   });
 

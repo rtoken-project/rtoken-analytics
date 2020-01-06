@@ -16,13 +16,13 @@
     "deploy_subgraph": "cd subgraph && yarn create-local && yarn deploy-local --watch",
     "start_subgraph": "yarn deploy_contracts && yarn deploy_subgraph",
     "test_local": "LOCAL=true SUBGRAPH_URL=$npm_package_subgraph_local_url mocha --timeout 7000 test/RTokenAnalytics.test.js",
-    "test": "SUBGRAPH_ID=$npm_package_subgraph_mainnet_id SUBGRAPH_URL=$npm_package_subgraph_mainnet_url mocha --timeout 7000"
+    "test": "SUBGRAPH_ID=$npm_package_subgraph_mainnet_id SUBGRAPH_URL=$npm_package_subgraph_mainnet_url mocha --timeout 7000 test/RTokenAnalytics.test.js"
   },
   "subgraph": {
     "mainnet": {
       "url": "https://api.thegraph.com/subgraphs/id/",
-      "id": "QmTvQvpuFAeBYpuMUGs2yRrqZj92YFiDymWD8eZ7AduA5r",
-      "contractAddress": "0xea8b224eDD3e342DEb514C4176c2E72Bcce6fFF9"
+      "id": "QmfUZ16H2GBxQ4eULAELDJjjVZcZ36TcDkwhoZ9cjF2WNc",
+      "contractAddress": "0x261b45D85cCFeAbb11F022eBa346ee8D1cd488c0"
     },
     "local": {
       "url": "http://localhost:8000/subgraphs/name/rtoken-project/rtoken-analytics",

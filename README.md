@@ -2,13 +2,13 @@
 
 This library provides easy tools for getting data about specific users of rToken. Out of the box you get:
 
-| Feature | Status|Notes |
-| --- | --- | --- |
-| Subgraph for rSAI on mainnet  | :hammer_and_wrench: | Redeemable single-collateral DAI [deployed subgraph](https://thegraph.com/explorer/subgraph/pi0neerpat/rdai-graph). Recommend do not use for production until completed. |
-| Subscribe to rToken data in your DAPP  | :hammer_and_wrench: | See `src/RTokenAnalytics.js`|
-| Local subgraph development and testing | :white_check_mark:  | See [Deploying to a local environment](#Deploying-to-a-local-environment)|
-| Bring-your-own rToken| :hammer_and_wrench:| See [instructions](#bring-your-own-rtoken) |
-| Your suggested feature here | ? | |
+| Feature                                   | Status              | Notes                                                                                                                                                                    |
+| ----------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Subgraph for rSAI on mainnet              | :hammer_and_wrench: | Redeemable single-collateral DAI [deployed subgraph](https://thegraph.com/explorer/subgraph/pi0neerpat/rdai-graph). Recommend do not use for production until completed. |
+| Subscribe to rToken data in your DAPP     | :hammer_and_wrench: | See `src/RTokenAnalytics.js`                                                                                                                                             |
+| Local subgraph development and testing    | :white_check_mark:  | See [Deploying to a local environment](#Deploying-to-a-local-environment)                                                                                                |
+| Bring-your-own rToken                     | :hammer_and_wrench: | See [instructions](#bring-your-own-rtoken)                                                                                                                               |
+| Your suggested feature. What do you need? | ?                   |                                                                                                                                                                          |
 
 ## Usage
 
@@ -30,7 +30,7 @@ const rtokenAnalytics = new RTokenAnalytics(
 );
 ```
 
-|        Args         | Options                                                   | Notes                                                                                                                |
+|      Arguments      | Options                                                   | Notes                                                                                                                |
 | :-----------------: | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 |   `interestRate`    |                                                           | Current rToken interest rate. See [Get Interest Rate](#get-interest-rate) for details                                |
 | `interestTolerance` |                                                           | Todo                                                                                                                 |
@@ -134,8 +134,6 @@ if (typeof window !== 'undefined') {
 TODO
 
 ## Bring-your-own rToken
-
-
 
 ## Deploying to a local environment
 
@@ -241,34 +239,39 @@ You should get a response like this
             ...
 ```
 
+:tada: Congrats! if you were successful with the initial setup, you can move to the next section to enable automatic redeployments of the subgraph upon changes.
+
 ### Testing and restarting
 
-Here are the current steps for re-deploying a subgraph once you've made some changes.
+Here are the current steps to fully automate :zap: subgraph re-deployment and testing upon changes to the subraph.
 
-Stop your docker instance, and restart it.
+In the repo `graph-node/docker`, stop your docker instance, and restart it.
 
 ```bash
-sudo rm -rf data # optional, use if you see "Error creating the subgraph: subgraph already exists"
-docker-compose up
+sudo rm -rf data && docker-compose up
+
 ```
+
 Open a new terminal, at the root directory of this repository.
 
 ```bash
 yarn start_ganache
+# leave running
 ```
 
-In a new terminal, deploy the contracts and start the automatic re-deployment of a new subgraph, whenever subgraph.yaml is changed.
+In a new terminal, deploy the contracts. This will also re-deploy the new subgraph, whenever subgraph.yaml is changed.
+
 ```bash
 yarn start_subgraph
-# Leave running
+# leave running
 ```
 
 In a new terminal, start the test suite
+
 ```bash
 nodemon -x yarn test_local
+# leave running
 ```
-
-TODO
 
 ## Contributing
 

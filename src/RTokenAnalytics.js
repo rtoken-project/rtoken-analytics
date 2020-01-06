@@ -6,6 +6,8 @@ const { createHttpLink } = require('apollo-link-http');
 require('babel-polyfill');
 const ethers = require('ethers');
 
+const BigNumber = require('bignumber.js');
+
 const { parseUnits, bigNumberify, formatUnits } = ethers.utils;
 
 const DEFAULT_SUBGRAPH_URL = process.env.SUBGRAPH_URL;
@@ -22,8 +24,7 @@ class RTokenAnalytics {
     this.interestTolerance = interestTolerance;
     this.network = network;
 
-    let uri = DEFAULT_SUBGRAPH_URL;
-    if (subgraphURL) uri = subgraphURL;
+    let uri = subgraphURL ? subgraphURL : DEFAULT_SUBGRAPH_URL;
     this.link = new createHttpLink({
       uri: `${uri}${subgraphID}`,
       fetch: fetch
@@ -65,37 +66,68 @@ class RTokenAnalytics {
   }
 
   // Returns list of addresses that an address has sent interest to
-  async getAllRecipients(address, timePeriod) {
+  async getAllOutgoing(address, timePeriod) {
     const operation = {
       query: gql`
-        query getUser($id: Bytes) {
-          user(id: $id) {
-            id
-            sentAddressList
+        query getAccount($id: Bytes) {
+          account(id: $id) {
+            balance
+            loansOwned {
+              amount
+              recipient {
+                id
+              }
+              hat {
+                id
+              }
+              transfers {
+                value
+                transaction {
+                  id
+                  timestamp
+                  blockNumber
+                }
+              }
+            }
           }
         }
       `,
       variables: { id: address }
     };
     let res = await makePromise(execute(this.link, operation));
-    return res.data.user.sentAddressList;
+    return res.data.account.loansOwned;
   }
 
   // Returns list of addresses that have sent any interest to this address, and the amounts
-  async getAllSenders(address, timePeriod) {
+  async getAllIncoming(address, timePeriod) {
     const operation = {
       query: gql`
-        query getUser($id: Bytes) {
-          user(id: $id) {
-            id
-            receivedAddressList
+        query getAccount($id: Bytes) {
+          account(id: $id) {
+            loansReceived {
+              amount
+              recipient {
+                id
+              }
+              hat {
+                id
+              }
+              transfers {
+                value
+                transaction {
+                  id
+                  timestamp
+                  blockNumber
+                }
+              }
+            }
           }
         }
       `,
       variables: { id: address }
     };
     let res = await makePromise(execute(this.link, operation));
-    return res.data.user.receivedAddressList;
+    return res.data.account.loansReceived;
   }
 
   // SENDING / RECEIVING
@@ -109,20 +141,86 @@ class RTokenAnalytics {
 
   // Returns total amount of interest received by an address from a single address
   async getInterestSent(addressFrom, addressTo, timePeriod) {
-    const loanID = `${addressFrom}-${addressTo}`;
     const operation = {
       query: gql`
-        query($id: Bytes) {
-          loan(id: $id) {
-            id
-            sInternalAmount
+        query getAccount($from: Bytes) {
+          account(id: $from) {
+            balance
+            loansOwned {
+              amount
+              recipient {
+                id
+              }
+              hat {
+                id
+              }
+              transfers {
+                value
+                transaction {
+                  id
+                  timestamp
+                  blockNumber
+                }
+              }
+            }
           }
         }
       `,
-      variables: { id: loanID }
+      variables: { from: addressFrom, to: addressTo }
     };
     let res = await makePromise(execute(this.link, operation));
-    return res.data.loan.sInternalAmount;
+
+    let interestSent = 0;
+
+    res.data.account.loansOwned.forEach(loan => {
+      if (loan.recipient.id === addressTo) {
+        let value = new BigNumber(0);
+        loan.transfers.forEach((transfer, index) => {
+          const rate = 0.04;
+
+          // Skip the first transfer
+          if (index === 0) {
+            value = value.plus(transfer.value);
+            return;
+          }
+          // If this is the final transfer, add interest until current time
+          if (index === loan.transfers.length - 1) {
+            value = value.plus(transfer.value);
+
+            const start = transfer.transaction.timestamp;
+            const date = new Date();
+            const now = Math.round(date.getTime() / 1000);
+
+            interestSent += this._calculateInterestOverTime(
+              value,
+              start,
+              now,
+              rate
+            );
+            // console.log('Final ransfer. Current value: ', value.toNumber());
+          }
+
+          // Add the accumulated interest between the transfers
+          interestSent += this._calculateInterestOverTime(
+            value,
+            loan.transfers[index - 1].transaction.timestamp,
+            transfer.transaction.timestamp,
+            rate
+          );
+
+          // Add the current transfer value to the running value
+          value = value.plus(transfer.value);
+        });
+      }
+      return;
+    });
+    return interestSent;
+  }
+
+  _calculateInterestOverTime(value, start, end, startingAPY) {
+    const duration = end - start;
+    const period = duration / 31557600; // Adjust for APY
+    return value * period * startingAPY;
   }
 
   // GLOBAL

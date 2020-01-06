@@ -14,21 +14,18 @@ const debug = {
 const COMPOUND_URL = 'https://api.compound.finance/api/v2/ctoken?addresses[]=';
 const daiCompoundAddress = '0xf5dce57282a584d2746faf1593d3121fcac444dc';
 
-const userA = '0x0006e4548aed4502ec8c844567840ce6ef1013f5';
-const userB = '0x5d7d257d97d8a81f51187a77c6dd226fb8424d90';
-const userC = '0xa153b8891e77f1ae037026514c927530d877fab8';
+// NOTE: change these if you are using a custom rToken (e.g. not rDAI)
+// A should be sending interest to B
+const userA = '0x9492510bbcb93b6992d8b7bb67888558e12dcac4';
+const userB = '0x358f6260f1f90cd11a10e251ce16ea526f131b02';
 
 const interestTolerance = 0;
 const network = 'mainnet';
 const subgraphURL = process.env.SUBGRAPH_URL;
 const subgraphID = process.env.SUBGRAPH_ID;
-const isLocal = process.env.LOCAL
+const isLocal = process.env.LOCAL;
 
-console.log(subgraphURL);
-console.log(subgraphID);
-console.log(isLocal);
-
-test('Test RTokenAnalytics', async accounts => {
+test('RTokenAnalytics', async accounts => {
   let rtokenAnalytics;
 
   before(async () => {
@@ -37,35 +34,43 @@ test('Test RTokenAnalytics', async accounts => {
       compoundRate = await getCompoundRate();
     }
 
+    console.log('Subgraph URL: ', subgraphURL);
+    console.log('Subgraph ID:  ', subgraphID);
+    console.log(
+      'Local test:   ',
+      typeof isLocal === 'undefined' ? false : true
+    );
+
     rtokenAnalytics = new RTokenAnalytics(
       compoundRate,
       interestTolerance,
       network,
-      subgraphID
+      subgraphID,
+      subgraphURL
     );
   });
 
-  it('getAllRecipients()', async () => {
-    let recipients = await rtokenAnalytics.getAllRecipients(userA);
-    assert.isAbove(recipients.length, 0, 'no recipients were returned');
-  });
-
-  it('getAllSenders()', async () => {
-    let senders = await rtokenAnalytics.getAllSenders(userB);
-    assert.isAbove(senders.length, 0, 'no senders were returned');
-  });
-
-  it('getTotalInterestPaid()', async () => {
-    let totalInterestPaid = await rtokenAnalytics.getTotalInterestPaid(userC);
-    let interest = new BigNumber(totalInterestPaid);
-    assert.isOk(interest.isGreaterThan(0), 'no interest has been paid');
-  });
+  // it('getAllOutgoing()', async () => {
+  //   let outgoing = await rtokenAnalytics.getAllOutgoing(userA);
+  //   assert.isAbove(outgoing.length, 0, 'no outgoing were returned');
+  // });
+  //
+  // it('getAllIncoming()', async () => {
+  //   let incoming = await rtokenAnalytics.getAllIncoming(userB);
+  //   assert.isAbove(incoming.length, 0, 'no incoming were returned');
+  // });
 
   it('getInterestSent()', async () => {
-    let totalInterestPaid = await rtokenAnalytics.getInterestSent(userA, userB);
-    let interest = new BigNumber(totalInterestPaid);
+    let interestSent = await rtokenAnalytics.getInterestSent(userA, userB);
+    let interest = new BigNumber(interestSent);
     assert.isOk(interest.isGreaterThan(0), 'no interest has been paid');
   });
+
+  // it('getTotalInterestPaid()', async () => {
+  //   let totalInterestPaid = await rtokenAnalytics.getTotalInterestPaid(userC);
+  //   let interest = new BigNumber(totalInterestPaid);
+  //   assert.isOk(interest.isGreaterThan(0), 'no interest has been paid');
+  // });
 });
 
 const getCompoundRate = async () => {

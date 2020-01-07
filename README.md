@@ -2,152 +2,103 @@
 
 This library provides easy tools for getting data about specific users of rToken. Out of the box you get:
 
-| Feature                                   | Status              | Notes                                                                                                                                                                    |
-| ----------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Subgraph for rSAI on mainnet              | :hammer_and_wrench: | Redeemable single-collateral DAI [deployed subgraph](https://thegraph.com/explorer/subgraph/pi0neerpat/rdai-graph). Recommend do not use for production until completed. |
-| Subscribe to rToken data in your DAPP     | :hammer_and_wrench: | See `src/RTokenAnalytics.js`                                                                                                                                             |
-| Local subgraph development and testing    | :white_check_mark:  | See [Deploying to a local environment](#Deploying-to-a-local-environment)                                                                                                |
-| Bring-your-own rToken                     | :hammer_and_wrench: | See [instructions](#bring-your-own-rtoken)                                                                                                                               |
-| Your suggested feature. What do you need? | ?                   |                                                                                                                                                                          |
+| Feature                      | Status             | Notes                                                                           |
+| ---------------------------- | ------------------ | ------------------------------------------------------------------------------- |
+| Get rDAI data in your dapp   | :white_check_mark: | [docs](#rtoken-analytics-sdk)                                                   |
+| Subgraph for rDAI on mainnet | :white_check_mark: | Deployed [subgraph](https://thegraph.com/explorer/subgraph/pi0neerpat/mcd-rdai) |
+| Bring-your-own rToken        | :white_check_mark: | [docs](#bring-your-own-rtoken)                                                  |
+| What else do you need?       | ?                  |                                                                                 |
+
+# rToken Analytics SDK
+
+## Install
+
+```bash
+yarn add rtoken-analytics
+```
 
 ## Usage
-
-Current available commands
-
-(Note these will be updated as a subscription service, rather than a single REST call)
-
-#### Initialize
 
 ```js
 import RTokenAnalytics from 'rtoken-analytics';
 
-const rtokenAnalytics = new RTokenAnalytics(
-  interestRate,
-  interestTolerance,
-  network,
-  subgraphID,
-  subgraphURL
-);
-```
+const MyComponent = () => {
+  const from = "0x9492510bbcb93b6992d8b7bb67888558e12dcac4"
+  const to = "0x8605e554111d8ea3295e69addaf8b2abf60d68a3"
 
-|      Arguments      | Options                                                   | Notes                                                                                                                |
-| :-----------------: | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-|   `interestRate`    |                                                           | Current rToken interest rate. See [Get Interest Rate](#get-interest-rate) for details                                |
-| `interestTolerance` |                                                           | Todo                                                                                                                 |
-|      `network`      |                                                           | "mainnet" is supported only                                                                                          |
-|    `subgraphID`     |                                                           | Get the most recent ID on the subgraph page: [mainnet](https://thegraph.com/explorer/subgraph/pi0neerpat/rdai-graph) |
-|   `[subgraphURL]`   | optional, default: https://api.thegraph.com/subgraphs/id/ |                                                                                                                      |
-
-## In Development
-
-#### User Stats
-
-Based on your own principal
-
-```js
-getTotalInterestGenerated(address, timePeriod);
-// Returns all interest accrued within time period no matter where it was sent
-
-getTotalInterestRetained(address, timePeriod);
-// Returns all accrued interest retained by the wallet
-
-getTotalInterestSent(address, timePeriod);
-// Returns all interest sent to wallets other than the user’s
-
-getAllRecipients(address, timePeriod);
-// Returns list of addresses that an address has sent interest to
-```
-
-#### Sending / Receiving
-
-Based on external wallets only
-
-```js
-getTotalInterestReceivedExternal(address, timePeriod);
-// Returns total amount of interest received by an address from all sources
-// Excludes interest generated from user’s own wallet
-
-getInterestSentByAddress(addressFrom, addressTo, timePeriod);
-// Returns total amount of interest received by an address from a single address
-
-getAllPayers(address, timePeriod);
-// Returns list of addresses that have sent any interest to this, and the amounts
-```
-
-#### Global
-
-```js
-getGlobalInterestGenerated(timePeriod);
-
-getGlobalInterestSent(timePeriod);
-```
-
-#### Token Balance Tracking
-
-```js
-getTokenBalanceHistoryByAddress(address, timePeriod);
-// Returns array of objects for each instance that a address’ rToken balance changes. Object returns:
-return {
-  // Amount of balance change
-  // Transaction Hash
-};
-```
-
-#### Get Interest Rate
-
-This is the suggested method for obtaining the Compound interest rate
-
-```js
-import axios from 'axios';
-
-const COMPOUND_URL = 'https://api.compound.finance/api/v2/ctoken?addresses[]=';
-const daiCompoundAddress = '0xf5dce57282a584d2746faf1593d3121fcac444dc';
-
-const getCompoundRate = async () => {
-  const res = await axios.get(`${COMPOUND_URL}${daiCompoundAddress}`);
-  const compoundRate = res.data.cToken[0].supply_rate.value;
-  const compoundRateFormatted = Math.round(compoundRate * 10000) / 100;
-
-  return {
-    compoundRate,
-    compoundRateFormatted
-  };
-};
-
-// Usage
-
-const { compoundRate, compoundRateFormatted } = await getCompoundRate();
-
-console.log(`Compound Rate: ${compoundRateFormatted}%`);
-// > Compound Rate: 4.56%
-
-// We recommend saving the rate for quick reference, as the API can be slow.
-if (typeof window !== 'undefined') {
-  localStorage.setItem('compoundRate', compoundRate);
+  const rTokenAnalytics = new RTokenAnalytics();
+  const interestSent = await rTokenAnalytics.getInterestSent(from, to);
 }
 ```
 
-## Subgraph
+If you are using your own rToken subgraph, you will need to provide this info in the arguments.
 
-## Usage
+```js
+const options = {
+  subgraphURL: 'some other url',
+  rdaiSubgraphId: 'some other id'
+};
+const rTokenAnalytics = new RTokenAnalytics(options);
+```
 
-TODO
+|    Arguments     | Default value                                    |
+| :--------------: | ------------------------------------------------ |
+|  `subgraphURL`   | `https://api.thegraph.com/subgraphs/id/`         |
+| `rdaiSubgraphId` | `QmfUZ16H2GBxQ4eULAELDJjjVZcZ36TcDkwhoZ9cjF2WNc` |
+
+## API
+
+### `getAllOutgoing(address)`
+
+Get all loans where interest is being sent to another address
+
+Returns array of active loans. Example:
+
+```js
+[
+  {
+    amount: '0.50000000058207661',
+    hat: { id: '11' },
+    recipient: { id: '0x358f6260f1f90cd11a10e251ce16ea526f131b02' }
+  },
+  {
+    amount: '24.49999999941792339'
+    // ...
+  }
+];
+```
+
+### `getAllIncoming(address)`
+
+Get all loans where interest is being received from another address
+
+Returns array of active loans (same schema as above)
+
+### `getInterestSent(fromAddress, toAddress)`
+
+Get the total amount of interest sent
+
+Returns: value in DAI
+
+> What other features do you want? Let us know by making an issue.
 
 ## Bring-your-own rToken
 
+If you deploy your own token, and you wish to use this SDK, you will need to deploy you own subgraph. As long as you didn't modify the [rToken contracts](https://github.com/rtoken-project/rtoken-contracts) too much, you can just deploy the subgraph in the [`/subgraph`]('subgraph/') folder. Be sure to modify `subgraph.yaml` with the correct `address` and `startBlock`.
+
 ## Deploying to a local environment
 
-> :warning: You probably don't need to do this! If your rToken is deployed to `Mainnet` or `Ropsten`, then you should use the hosted servers provided by The Graph.
+> :warning: You probably don't need to do this! If your rToken is deployed to `Mainnet` or `Ropsten`, and you are using the standard rToken contracts, then you should use the hosted servers provided by The Graph.
 
 The rToken team uses a local subgraph deployment to enable rapid development and testing of the tools provided here. In this section we will do the following:
 
 1. Deploy the `rtoken-analytics` subgraph to a local docker container on your machine.
-2. Deploy the contracts to a local Ganache instance.
-3. Check that your setup is operating correctly.
+2. Deploy the rToken contracts to a local Ganache instance.
+3. Check that your setup is correct by running some tests
 
 ### Setup a local subgraph
 
-> If you've already performed the setup process, you should skip down to the [Testing and restarting](#Testing-and-restarting) section.
+> If you've previously performed the setup process, you should skip down to the [Testing and restarting](#Testing-and-restarting) section.
 
 If you get stuck during setup, see additional instructions from The Graph docs [here](https://thegraph.com/docs/quick-start#local-development).
 
@@ -273,6 +224,44 @@ nodemon -x yarn test_local
 # leave running
 ```
 
-## Contributing
+# Misc. tools
+
+## Get the Compound Interest Rate
+
+This is one method for obtaining the Compound interest rate in your dapp.
+
+```js
+import axios from 'axios';
+
+const COMPOUND_URL = 'https://api.compound.finance/api/v2/ctoken?addresses[]=';
+const daiCompoundAddress = '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643';
+
+const getCompoundRate = async () => {
+  const res = await axios.get(`${COMPOUND_URL}${daiCompoundAddress}`);
+  const compoundRate = res.data.cToken[0].supply_rate.value;
+  const compoundRateFormatted = Math.round(compoundRate * 10000) / 100;
+
+  return {
+    compoundRate,
+    compoundRateFormatted
+  };
+};
+```
+
+Then use it like this
+
+```js
+const { compoundRate, compoundRateFormatted } = await getCompoundRate();
+
+console.log(`Compound Rate: ${compoundRateFormatted}%`);
+// > Compound Rate: 4.56%
+
+// Recommend you save the rate for quick reference, as the API can be slow.
+if (typeof window !== 'undefined') {
+  localStorage.setItem('compoundRate', compoundRate);
+}
+```
+
+# Contributing
 
 Contributions, suggestions, and issues are welcome. At the moment, there are no strict guidelines to follow.

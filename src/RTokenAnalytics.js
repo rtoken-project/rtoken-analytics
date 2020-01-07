@@ -20,10 +20,10 @@ class RTokenAnalytics {
     this.web3Provider = options.web3Provider; // Curently unused
     this.interestRate = options.interestRate || 0; // Currently unused
     this.interestTolerance = options.interestTolerance || 0; // Currently unused
-    const uri = options.subgraphURL || DEFAULT_SUBGRAPH_URL;
+    const url = options.subgraphURL || DEFAULT_SUBGRAPH_URL;
     const rdai_id = options.rdaiSubgraphId || DEFAULT_SUBGRAPH_ID_RDAI;
     this.rTokenLink = new createHttpLink({
-      uri: `${uri}${rdai_id}`,
+      uri: `${url}${rdai_id}`,
       fetch: fetch
     });
   }

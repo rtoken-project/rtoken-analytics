@@ -1,6 +1,6 @@
 {
   "name": "rtoken-analytics",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Data and analytics utility for rToken",
   "main": "src/index.js",
   "repository": "git@github.com:rtoken-project/rtoken-analytics.git",
@@ -30,7 +30,7 @@
       "contractAddress": ""
     }
   },
-  "peerDependencies": {
+  "dependencies": {
     "apollo-link": "^1.2.13",
     "apollo-link-http": "^1.5.16",
     "graphql-tag": "^2.10.1",

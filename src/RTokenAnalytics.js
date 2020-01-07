@@ -4,7 +4,6 @@ const axios = require('axios');
 
 const fetch = require('node-fetch');
 const { createHttpLink } = require('apollo-link-http');
-require('babel-polyfill');
 // const ethers = require('ethers');
 
 const BigNumber = require('bignumber.js');
@@ -163,12 +162,15 @@ class RTokenAnalytics {
           }
         }
       `,
-      variables: { from: addressFrom, to: addressTo }
+      variables: {
+        from: addressFrom.toLowerCase(),
+        to: addressTo.toLowerCase()
+      }
     };
     let res = await makePromise(execute(this.rTokenLink, operation));
     let interestSent = 0;
     let value = new BigNumber(0);
-
+    if (res.data.account.loansOwned.length < 1) return 0;
     const loan = res.data.account.loansOwned[0];
     for (let index = 0; index < loan.transfers.length; index++) {
       const transfer = loan.transfers[index];

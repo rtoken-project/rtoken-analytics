@@ -1,5 +1,6 @@
 const { execute, makePromise } = require('apollo-link');
 const gql = require('graphql-tag');
+const axios = require('axios');
 
 const fetch = require('node-fetch');
 const { createHttpLink } = require('apollo-link-http');
@@ -11,19 +12,20 @@ const BigNumber = require('bignumber.js');
 const { parseUnits, bigNumberify, formatUnits } = ethers.utils;
 
 const DEFAULT_SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/id/';
-const DEFAULT_SUBGRAPH_ID = 'QmfUZ16H2GBxQ4eULAELDJjjVZcZ36TcDkwhoZ9cjF2WNc';
+const DEFAULT_SUBGRAPH_ID_RDAI =
+  'QmfUZ16H2GBxQ4eULAELDJjjVZcZ36TcDkwhoZ9cjF2WNc';
 
 class RTokenAnalytics {
   constructor(options = {}) {
+    this.web3Provider = options.web3Provider; // Curently unused
     this.interestRate = options.interestRate || 0; // Currently unused
     this.interestTolerance = options.interestTolerance || 0; // Currently unused
     const uri = options.subgraphURL || DEFAULT_SUBGRAPH_URL;
-    const id = options.subgraphID || DEFAULT_SUBGRAPH_ID;
-    this.link = new createHttpLink({
-      uri: `${uri}${id}`,
+    const rdai_id = options.rdaiSubgraphId || DEFAULT_SUBGRAPH_ID_RDAI;
+    this.rTokenLink = new createHttpLink({
+      uri: `${uri}${rdai_id}`,
       fetch: fetch
     });
-    console.log(uri);
   }
 
   // USER STATS
@@ -50,7 +52,7 @@ class RTokenAnalytics {
       `,
       variables: { id: address }
     };
-    let res = await makePromise(execute(this.link, operation));
+    let res = await makePromise(execute(this.rTokenLink, operation));
     return res.data.user.totalInterestPaid;
   }
 
@@ -89,7 +91,7 @@ class RTokenAnalytics {
       `,
       variables: { id: address }
     };
-    let res = await makePromise(execute(this.link, operation));
+    let res = await makePromise(execute(this.rTokenLink, operation));
     return res.data.account.loansOwned;
   }
 
@@ -121,7 +123,7 @@ class RTokenAnalytics {
       `,
       variables: { id: address }
     };
-    let res = await makePromise(execute(this.link, operation));
+    let res = await makePromise(execute(this.rTokenLink, operation));
     return res.data.account.loansReceived;
   }
 
@@ -138,10 +140,10 @@ class RTokenAnalytics {
   async getInterestSent(addressFrom, addressTo, timePeriod) {
     const operation = {
       query: gql`
-        query getAccount($from: Bytes) {
+        query getAccount($from: Bytes, $to: Bytes) {
           account(id: $from) {
             balance
-            loansOwned {
+            loansOwned(where: { recipient: $to }) {
               amount
               recipient {
                 id
@@ -163,51 +165,52 @@ class RTokenAnalytics {
       `,
       variables: { from: addressFrom, to: addressTo }
     };
-    let res = await makePromise(execute(this.link, operation));
-
+    let res = await makePromise(execute(this.rTokenLink, operation));
     let interestSent = 0;
+    let value = new BigNumber(0);
 
-    res.data.account.loansOwned.forEach(loan => {
-      if (loan.recipient.id === addressTo) {
-        let value = new BigNumber(0);
-        loan.transfers.forEach((transfer, index) => {
-          const rate = 0.04;
+    const loan = res.data.account.loansOwned[0];
+    for (let index = 0; index < loan.transfers.length; index++) {
+      const transfer = loan.transfers[index];
+      let rate = null;
 
-          // Skip the first transfer
-          if (index === 0) {
-            value = value.plus(transfer.value);
-            return;
-          }
-          // If this is the final transfer, add interest until current time
-          if (index === loan.transfers.length - 1) {
-            value = value.plus(transfer.value);
-
-            const start = transfer.transaction.timestamp;
-            const date = new Date();
-            const now = Math.round(date.getTime() / 1000);
-
-            interestSent += this._calculateInterestOverTime(
-              value,
-              start,
-              now,
-              rate
-            );
-            // console.log('Final ransfer. Current value: ', value.toNumber());
-          }
-
-          // Add the accumulated interest between the transfers
-          interestSent += this._calculateInterestOverTime(
-            value,
-            loan.transfers[index - 1].transaction.timestamp,
-            transfer.transaction.timestamp,
-            rate
-          );
-
-          // Add the current transfer value to the running value
-          value = value.plus(transfer.value);
-        });
+      // If this is the first transfer, skip it
+      if (index === 0) {
+        value = value.plus(transfer.value);
       }
-    });
+      // If this is the last transfer, add the accumulated interest until the current time
+      else if (index === loan.transfers.length - 1) {
+        value = value.plus(transfer.value);
+
+        const start = transfer.transaction.timestamp;
+        const date = new Date();
+        const now = Math.round(date.getTime() / 1000);
+
+        rate = await this._getCompoundRate(start);
+        interestSent += this._calculateInterestOverTime(
+          value,
+          start,
+          now,
+          rate
+        );
+        // console.log('Final ransfer. Current value: ', value.toNumber());
+      } else {
+        // Normal case: Add the accumulated interest since last transfer
+        rate = await this._getCompoundRate(
+          loan.transfers[index - 1].transaction.timestamp
+        );
+
+        interestSent += this._calculateInterestOverTime(
+          value,
+          loan.transfers[index - 1].transaction.timestamp,
+          transfer.transaction.timestamp,
+          rate
+        );
+
+        // Add the current transfer value to the running value
+        value = value.plus(transfer.value);
+      }
+    }
     return interestSent;
   }
 
@@ -215,6 +218,41 @@ class RTokenAnalytics {
     const duration = end - start;
     const period = duration / 31557600; // Adjust for APY
     return value * period * startingAPY;
+  }
+
+  async _getCompoundRate(blockTimestamp) {
+    // Note: This is incorrect. Calculating rate is much more complex than just getting it from storage.
+    // I was trying to avoid using compoiund historic data API, since its so slow...
+
+    // const res = await this.web3Provider.getStorageAt(
+    //   '0xec163986cC9a6593D6AdDcBFf5509430D348030F',
+    //   1,
+    //   9220708
+    // );
+    // const unformatted_rate = new BigNumber(2102400 * parseInt(res, 16));
+    // const rate = unformatted_rate.times(BigNumber(10).pow(-18));
+    // console.log(
+    //   `Compound rate (WRONG): ${Math.round(rate.toNumber() * 100000) / 1000}%`
+    // );
+
+    // Used to inspect storage on a contract
+    // for (let index = 0; index < 23; index++) {
+    //   const rate = await this.web3Provider.getStorageAt(
+    //     '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
+    //     index,
+    //     9220800
+    //   );
+    //   // console.log(`[${index}] ${rate}`);
+    //   console.log(`[${index}] ${parseInt(rate, 16)}`);
+    // }
+
+    // Correct, new way to get the rate
+    const COMPOUND_URL =
+      'https://api.compound.finance/api/v2/market_history/graph?asset=0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643';
+    const params = `&min_block_timestamp=${blockTimestamp}&max_block_timestamp=${blockTimestamp +
+      1}&num_buckets=1`;
+    const res = await axios.get(`${COMPOUND_URL}${params}`);
+    return res.data.supply_rates[0].rate;
   }
 
   // GLOBAL

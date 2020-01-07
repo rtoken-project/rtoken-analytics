@@ -179,6 +179,18 @@ class RTokenAnalytics {
       // If this is the first transfer, skip it
       if (index === 0) {
         value = value.plus(transfer.value);
+        if (loan.transfers.length === 1) {
+          const start = transfer.transaction.timestamp;
+          const date = new Date();
+          const now = Math.round(date.getTime() / 1000);
+          rate = await this._getCompoundRate(start);
+          interestSent += this._calculateInterestOverTime(
+            value,
+            start,
+            now,
+            rate
+          );
+        }
       }
       // If this is the last transfer, add the accumulated interest until the current time
       else if (index === loan.transfers.length - 1) {

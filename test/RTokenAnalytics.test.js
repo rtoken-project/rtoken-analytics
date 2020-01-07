@@ -58,15 +58,15 @@ test('RTokenAnalytics', async accounts => {
     rtokenAnalytics = new RTokenAnalytics(options);
   });
 
-  // it('getAllOutgoing()', async () => {
-  //   let outgoing = await rtokenAnalytics.getAllOutgoing(userA);
-  //   assert.isAbove(outgoing.length, 0, 'no outgoing were returned');
-  // });
-  //
-  // it('getAllIncoming()', async () => {
-  //   let incoming = await rtokenAnalytics.getAllIncoming(userB);
-  //   assert.isAbove(incoming.length, 0, 'no incoming were returned');
-  // });
+  it('getAllOutgoing()', async () => {
+    let outgoing = await rtokenAnalytics.getAllOutgoing(userA);
+    assert.isAbove(outgoing.length, 0, 'no outgoing were returned');
+  });
+
+  it('getAllIncoming()', async () => {
+    let incoming = await rtokenAnalytics.getAllIncoming(userB);
+    assert.isAbove(incoming.length, 0, 'no incoming were returned');
+  });
 
   it('getInterestSent()', async () => {
     let interestSent = await rtokenAnalytics.getInterestSent(userA, userB);

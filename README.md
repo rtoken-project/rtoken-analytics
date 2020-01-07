@@ -1,15 +1,13 @@
 # rToken Analytics
 
-This library provides easy tools for getting data about specific users of rToken. Out of the box you get:
+This library provides easy tools for getting data about specific users of rToken.
 
 | Feature                      | Status             | Notes                                                                           |
 | ---------------------------- | ------------------ | ------------------------------------------------------------------------------- |
-| Get rDAI data in your dapp   | :white_check_mark: | [docs](#rtoken-analytics-sdk)                                                   |
+| Get rDAI data in your dapp   | :white_check_mark: |                                                                                 |
 | Subgraph for rDAI on mainnet | :white_check_mark: | Deployed [subgraph](https://thegraph.com/explorer/subgraph/pi0neerpat/mcd-rdai) |
 | Bring-your-own rToken        | :white_check_mark: | [docs](#bring-your-own-rtoken)                                                  |
 | What else do you need?       | ?                  |                                                                                 |
-
-# rToken Analytics SDK
 
 ## Install
 

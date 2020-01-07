@@ -5,11 +5,11 @@ const axios = require('axios');
 const fetch = require('node-fetch');
 const { createHttpLink } = require('apollo-link-http');
 require('babel-polyfill');
-const ethers = require('ethers');
+// const ethers = require('ethers');
 
 const BigNumber = require('bignumber.js');
 
-const { parseUnits, bigNumberify, formatUnits } = ethers.utils;
+// const { parseUnits, bigNumberify, formatUnits } = ethers.utils;
 
 const DEFAULT_SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/id/';
 const DEFAULT_SUBGRAPH_ID_RDAI =

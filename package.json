@@ -1,6 +1,6 @@
 {
   "name": "rtoken-analytics",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Data and analytics utility for rToken",
   "main": "src/index.js",
   "repository": "git@github.com:rtoken-project/rtoken-analytics.git",

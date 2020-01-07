@@ -1,6 +1,6 @@
 # rToken Analytics
 
-This library provides easy tools for getting data about specific users of rToken.
+This library provides tools for getting rDAI and rToken data into your dapp.
 
 | Feature                      | Status             | Notes                                                                           |
 | ---------------------------- | ------------------ | ------------------------------------------------------------------------------- |

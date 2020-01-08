@@ -27,7 +27,7 @@ export function handleInterestPaid(event: InterestPaid): void {
   // Check all accounts sending interest to this address
   // Calculate the amounts which each address has sent?
 
-  entity.save();
+  entity.save()
 }
 
 export function handleHatChanged(event: HatChanged): void {

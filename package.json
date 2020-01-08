@@ -1,8 +1,8 @@
 {
   "name": "rtoken-analytics",
-  "version": "0.0.5",
+  "version": "0.0.9",
   "description": "Data and analytics utility for rToken",
-  "main": "index.js",
+  "main": "src/index.js",
   "repository": "git@github.com:rtoken-project/rtoken-analytics.git",
   "author": "Patrick Gallagher <blockchainbuddha@gmail.com>",
   "license": "MIT",
@@ -16,13 +16,13 @@
     "deploy_subgraph": "cd subgraph && yarn create-local && yarn deploy-local --watch",
     "start_subgraph": "yarn deploy_contracts && yarn deploy_subgraph",
     "test_local": "LOCAL=true SUBGRAPH_URL=$npm_package_subgraph_local_url mocha --timeout 7000 test/RTokenAnalytics.test.js",
-    "test": "SUBGRAPH_ID=$npm_package_subgraph_mainnet_id SUBGRAPH_URL=$npm_package_subgraph_mainnet_url mocha --timeout 7000"
+    "test": "SUBGRAPH_ID=$npm_package_subgraph_mainnet_id SUBGRAPH_URL=$npm_package_subgraph_mainnet_url mocha --timeout 7000 test/RTokenAnalytics.test.js"
   },
   "subgraph": {
     "mainnet": {
       "url": "https://api.thegraph.com/subgraphs/id/",
-      "id": "QmTvQvpuFAeBYpuMUGs2yRrqZj92YFiDymWD8eZ7AduA5r",
-      "contractAddress": "0xea8b224eDD3e342DEb514C4176c2E72Bcce6fFF9"
+      "id": "QmfUZ16H2GBxQ4eULAELDJjjVZcZ36TcDkwhoZ9cjF2WNc",
+      "contractAddress": "0x261b45D85cCFeAbb11F022eBa346ee8D1cd488c0"
     },
     "local": {
       "url": "http://localhost:8000/subgraphs/name/rtoken-project/rtoken-analytics",
@@ -31,19 +31,21 @@
     }
   },
   "dependencies": {
-    "@decentral.ee/web3-test-helpers": "^0.2.1",
-    "@truffle/hdwallet-provider": "^1.0.26",
     "apollo-link": "^1.2.13",
     "apollo-link-http": "^1.5.16",
+    "graphql-tag": "^2.10.1",
     "axios": "^0.19.0",
-    "bignumber": "^1.1.0",
+    "node-fetch": "^2.6.0",
+    "bignumber": "^1.1.0"
+  },
+  "devDependencies": {
+    "ethers": "^4.0.40",
+    "@decentral.ee/web3-test-helpers": "^0.2.1",
+    "@truffle/hdwallet-provider": "^1.0.26",
     "chai": "^4.2.0",
     "eth-registry": "^1.2.0",
-    "ethers": "^4.0.40",
     "graphql": "^14.5.8",
-    "graphql-tag": "^2.10.1",
     "mocha": "^6.2.2",
-    "node-fetch": "^2.6.0",
     "openzeppelin-solidity": "^2.4.0",
     "openzeppelin-test-helpers": "^0.5.1",
     "truffle": "^5.1.1"

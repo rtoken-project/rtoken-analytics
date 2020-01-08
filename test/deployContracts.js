@@ -291,16 +291,6 @@ contract('RToken', accounts => {
       receivedSavings: '100.00000',
       interestPayable: '0.00000'
     });
-
-    await expectRevert(
-      rToken.transfer(customer2, toWad(100.1), { from: customer1 }),
-      'Not enough balance to transfer'
-    );
-    await expectRevert(
-      rToken.transferFrom(customer1, customer2, toWad(1), { from: admin }),
-      'Not enough allowance for transfer'
-    );
-
     await doBingeBorrowing();
     await expectAccount(customer1, {
       tokenBalance: '100.00000',
@@ -381,25 +371,25 @@ contract('RToken', accounts => {
       totalSavingsAmount: '90.00103'
     });
 
-    await web3tx(
-      rToken.redeemAndTransfer,
-      'rToken.redeem 2 of customer1 to customer3',
-      {
-        inLogs: [
-          {
-            name: 'Transfer',
-            args: {
-              from: customer1,
-              to: ZERO_ADDRESS,
-              value: toWad(2)
-            }
-          }
-        ]
-      }
-    )(customer3, toWad(2), {
-      from: customer1
-    });
-    assert.equal(wad4human(await token.balanceOf.call(customer3)), '2.00000');
+    // await web3tx(
+    //   rToken.redeemAndTransfer,
+    //   'rToken.redeem 2 of customer1 to customer3',
+    //   {
+    //     inLogs: [
+    //       {
+    //         name: 'Transfer',
+    //         args: {
+    //           from: customer1,
+    //           to: ZERO_ADDRESS,
+    //           value: toWad(2)
+    //         }
+    //       }
+    //     ]
+    //   }
+    // )(customer3, toWad(2), {
+    //   from: customer1
+    // });
+    // assert.equal(wad4human(await token.balanceOf.call(customer3)), '2.00000');
   });
 
   // it('#3 rToken normal operations with hat', async () => {

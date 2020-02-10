@@ -1,19 +1,9 @@
-// https://mathiasbynens.be/notes/globalthis
-(function() {
-  if (typeof globalThis === 'object') return;
-  Object.prototype.__defineGetter__('__magic__', function() {
-    return this;
-  });
-  __magic__.globalThis = __magic__; // lolwat
-  delete Object.prototype.__magic__;
-})();
-global.self = globalThis;
-
+require('babel-polyfill');
 const { execute, makePromise } = require('apollo-link');
 const gql = require('graphql-tag');
 const axios = require('axios');
 
-const fetch = require('node-fetch');
+const fetch = require('cross-fetch');
 const { createHttpLink } = require('apollo-link-http');
 // const ethers = require('ethers');
 

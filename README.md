@@ -4,9 +4,9 @@ This library provides tools for getting rDAI and rToken data into your dapp.
 
 | Feature                      | Status             | Notes                                                                           |
 | ---------------------------- | ------------------ | ------------------------------------------------------------------------------- |
-| Get rDAI data in your dapp   | :white_check_mark: |                                                                                 |
+| Get rDAI data in your dapp   | :white_check_mark: | Currently in Beta                                                               |
 | Subgraph for rDAI on mainnet | :white_check_mark: | Deployed [subgraph](https://thegraph.com/explorer/subgraph/pi0neerpat/mcd-rdai) |
-| Bring-your-own rToken        | :white_check_mark: | [docs](#bring-your-own-rtoken)                                                  |
+| Roll-your-own rToken         | :white_check_mark: | [docs](#bring-your-own-rtoken)                                                  |
 | What else do you need?       | ?                  |                                                                                 |
 
 ## Install

@@ -2,7 +2,7 @@
   "name": "rtoken-analytics",
   "version": "0.0.9",
   "description": "Data and analytics utility for rToken",
-  "main": "dist/index.js",
+  "main": "src/rtoken-analytics.js",
   "repository": "git@github.com:rtoken-project/rtoken-analytics.git",
   "author": "Patrick Gallagher <blockchainbuddha@gmail.com>",
   "license": "MIT",
@@ -42,12 +42,13 @@
     "apollo-link-http": "^1.5.16",
     "axios": "^0.19.0",
     "bignumber": "^1.1.0",
+    "cross-fetch": "^3.0.4",
     "graphql-tag": "^2.10.1",
-    "node-fetch": "^2.6.0"
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.3",
-    "@babel/preset-react": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
     "@decentral.ee/web3-test-helpers": "^0.2.1",
     "@truffle/hdwallet-provider": "^1.0.26",
     "babel-loader": "^8.0.6",

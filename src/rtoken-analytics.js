@@ -353,13 +353,18 @@ class RTokenAnalytics {
     if (recipients && recipients.length) {
       for (let i = 0; i < recipients.length; i++) {
         const balanceBN = await rdai.balanceOf(recipients[i]);
-        console.log('balance: ', balanceBN.toString());
         const interestBN = await rdai.interestPayableOf(recipients[i]);
-        console.log('interest: ', interestBN.toString());
         totalEarned = totalEarned.add(interestBN).add(balanceBN);
       }
     }
     return totalEarned.toString();
+  }
+  async getHatIDByAddress(address) {
+    const rdai = await this.getContract('rdai');
+    const hat = await rdai.getHatByAddress(address);
+    let hatID = null;
+    if (hat) hatID = hat.hatID.toString();
+    return hatID;
   }
 }
 

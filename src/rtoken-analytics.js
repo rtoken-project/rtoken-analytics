@@ -332,23 +332,34 @@ class RTokenAnalytics {
   async receivedSavingsOf(address) {
     const rdai = await this.getContract('rdai');
     const savings = await rdai.receivedSavingsOf(address);
-    console.log(savings);
     return savings;
   }
   async receivedSavingsOfPerHat(hatID) {
     const rdai = await this.getContract('rdai');
     const { recipients } = await rdai.getHatByID(hatID);
     let savingsSum = bigNumberify(0);
-    console.log(recipients);
     if (recipients && recipients.length) {
       for (let i = 0; i < recipients.length; i++) {
         const amountBN = await rdai.receivedSavingsOf(recipients[i]);
-        console.log(amountBN);
         savingsSum = savingsSum.add(amountBN);
-        console.log(savingsSum);
       }
     }
     return savingsSum.toString();
+  }
+  async amountEarnedPerHat(hatID) {
+    const rdai = await this.getContract('rdai');
+    const { recipients } = await rdai.getHatByID(hatID);
+    let totalEarned = bigNumberify(0);
+    if (recipients && recipients.length) {
+      for (let i = 0; i < recipients.length; i++) {
+        const balanceBN = await rdai.balanceOf(recipients[i]);
+        console.log('balance: ', balanceBN.toString());
+        const interestBN = await rdai.interestPayableOf(recipients[i]);
+        console.log('interest: ', interestBN.toString());
+        totalEarned = totalEarned.add(interestBN).add(balanceBN);
+      }
+    }
+    return totalEarned.toString();
   }
 }
 

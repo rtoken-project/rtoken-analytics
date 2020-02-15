@@ -5,7 +5,9 @@ const axios = require('axios');
 
 const fetch = require('cross-fetch');
 const { createHttpLink } = require('apollo-link-http');
-// const ethers = require('ethers');
+
+const ethers = require('ethers');
+const CONTRACTS = require('./constants');
 
 const BigNumber = require('bignumber.js');
 
@@ -20,12 +22,40 @@ class RTokenAnalytics {
     this.web3Provider = options.web3Provider; // Curently unused
     this.interestRate = options.interestRate || 0; // Currently unused
     this.interestTolerance = options.interestTolerance || 0; // Currently unused
+    this.network = options.network || 'homestead';
+    this.infuraEndpointKey = options.infuraEndpointKey || '';
     const url = options.subgraphURL || DEFAULT_SUBGRAPH_URL;
     const rdai_id = options.rdaiSubgraphId || DEFAULT_SUBGRAPH_ID_RDAI;
     this.rTokenLink = new createHttpLink({
       uri: `${url}${rdai_id}`,
       fetch: fetch
     });
+    this.web3Provider = this.getWeb3Provider(
+      this.network,
+      this.infuraEndpointKey
+    );
+  }
+
+  getWeb3Provider(network, infuraEndpointKey) {
+    try {
+      const web3Provider = new ethers.providers.InfuraProvider(
+        network,
+        infuraEndpointKey
+      );
+      return web3Provider;
+    } catch (error) {
+      console.log('error setting up web3 provider: ', error);
+      return;
+    }
+  }
+
+  async getContract(name) {
+    const contract = new ethers.Contract(
+      CONTRACTS[name][this.network],
+      CONTRACTS[name].abi,
+      this.web3Provider
+    );
+    return contract;
   }
 
   // USER STATS
@@ -295,6 +325,20 @@ class RTokenAnalytics {
       // Transaction Hash
     };
   }
+
+  // High Priests Additions
+  async receivedSavingsOf(address) {
+    const rdai = await this.getContract('rdai');
+    const savings = await rdai.receivedSavingsOf(address);
+    console.log(savings);
+    return savings;
+  }
+  // async receivedSavingsOfPerHat(hatID) {
+  //   const rdai = await this.getContract('rdai');
+  //   const savings = await rdai.receivedSavingsOf(address);
+  //   console.log(savings);
+  //   return savings;
+  // }
 }
 
 module.exports = RTokenAnalytics;

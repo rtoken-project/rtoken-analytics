@@ -366,6 +366,34 @@ class RTokenAnalytics {
     if (hat) hatID = hat.hatID.toString();
     return hatID;
   }
+
+  async allUsersWithHat(hatID) {
+    const operation = {
+      query: gql`
+        query allUsersWithHat($hatID: String) {
+          accounts(
+            where: {
+              id_not: "0x0000000000000000000000000000000000000000"
+              hat: $hatID
+            }
+          ) {
+            id
+            balance
+            hat {
+              id
+            }
+          }
+        }
+      `,
+      variables: {
+        hatID: hatID
+      }
+    };
+    let res = await makePromise(execute(this.rTokenLink, operation));
+    let accounts = [];
+    if (res.data && res.data.accounts) accounts = res.data.accounts;
+    return accounts;
+  }
 }
 
 module.exports = RTokenAnalytics;

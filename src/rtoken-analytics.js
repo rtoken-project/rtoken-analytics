@@ -7,6 +7,8 @@ const fetch = require('cross-fetch');
 const { createHttpLink } = require('apollo-link-http');
 
 const ethers = require('ethers');
+const { parseUnits, formatUnits, bigNumberify } = ethers.utils;
+
 const CONTRACTS = require('./constants');
 
 const BigNumber = require('bignumber.js');
@@ -333,12 +335,21 @@ class RTokenAnalytics {
     console.log(savings);
     return savings;
   }
-  // async receivedSavingsOfPerHat(hatID) {
-  //   const rdai = await this.getContract('rdai');
-  //   const savings = await rdai.receivedSavingsOf(address);
-  //   console.log(savings);
-  //   return savings;
-  // }
+  async receivedSavingsOfPerHat(hatID) {
+    const rdai = await this.getContract('rdai');
+    const { recipients } = await rdai.getHatByID(hatID);
+    let savingsSum = bigNumberify(0);
+    console.log(recipients);
+    if (recipients && recipients.length) {
+      for (let i = 0; i < recipients.length; i++) {
+        const amountBN = await rdai.receivedSavingsOf(recipients[i]);
+        console.log(amountBN);
+        savingsSum = savingsSum.add(amountBN);
+        console.log(savingsSum);
+      }
+    }
+    return savingsSum.toString();
+  }
 }
 
 module.exports = RTokenAnalytics;

@@ -334,7 +334,7 @@ class RTokenAnalytics {
     const savings = await rdai.receivedSavingsOf(address);
     return savings;
   }
-  async receivedSavingsOfPerHat(hatID) {
+  async receivedSavingsOfByHat(hatID) {
     const rdai = await this.getContract('rdai');
     const { recipients } = await rdai.getHatByID(hatID);
     let savingsSum = bigNumberify(0);
@@ -346,7 +346,7 @@ class RTokenAnalytics {
     }
     return savingsSum.toString();
   }
-  async amountEarnedPerHat(hatID) {
+  async amountEarnedByHat(hatID) {
     const rdai = await this.getContract('rdai');
     const { recipients } = await rdai.getHatByID(hatID);
     let totalEarned = bigNumberify(0);

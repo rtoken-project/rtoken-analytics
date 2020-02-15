@@ -68,7 +68,6 @@ class RTokenAnalytics {
       query: gql`
         query getAccount($id: Bytes) {
           account(id: $id) {
-            balance
             loansOwned {
               amount
               recipient {

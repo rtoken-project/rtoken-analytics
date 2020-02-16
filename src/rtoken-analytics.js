@@ -337,7 +337,7 @@ class RTokenAnalytics {
     if (recipients && recipients.length) {
       for (let i = 0; i < recipients.length; i++) {
         const amountBN = await rdai.receivedSavingsOf(recipients[i]);
-        savingsSum = savingsSum.add(amountBN);
+        savingsSum = savingsSum.plus(amountBN);
       }
     }
     return savingsSum.toString();

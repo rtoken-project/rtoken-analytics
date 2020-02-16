@@ -366,7 +366,6 @@ class RTokenAnalytics {
     if (hat) hatID = hat.hatID.toString();
     return hatID;
   }
-
   async allUsersWithHat(hatID) {
     const operation = {
       query: gql`
@@ -393,6 +392,14 @@ class RTokenAnalytics {
     let accounts = [];
     if (res.data && res.data.accounts) accounts = res.data.accounts;
     return accounts;
+  }
+  async userContributionToHat(hatID, address) {
+    const currentHatID = await this.getHatIDByAddress(address);
+    if (currentHatID !== hatID) return 0;
+    const rdai = await this.getContract('rdai');
+    let amount = 0;
+    amount = await rdai.balanceOf(address);
+    return amount.toString();
   }
 }
 

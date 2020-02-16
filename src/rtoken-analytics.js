@@ -390,8 +390,18 @@ class RTokenAnalytics {
     };
     let res = await makePromise(execute(this.rTokenLink, operation));
     let accounts = [];
-    if (res.data && res.data.accounts) accounts = res.data.accounts;
-    return accounts;
+    let topDonor = {
+      balance: 0,
+      id: ''
+    };
+    if (res.data && res.data.accounts) {
+      accounts = res.data.accounts;
+      for (let i = 0; i < accounts.length; i++) {
+        if (JSON.parse(accounts[i].balance) > topDonor.balance)
+          topDonor = accounts[i];
+      }
+    }
+    return { topDonor, accounts };
   }
   async userContributionToHat(hatID, address) {
     const currentHatID = await this.getHatIDByAddress(address);
@@ -400,6 +410,20 @@ class RTokenAnalytics {
     let amount = 0;
     amount = await rdai.balanceOf(address);
     return amount.toString();
+  }
+  async getTopDonorByHatGroup(hats) {
+    const hatsArray = JSON.parse(hats);
+    let masterDonor = { id: 'null', balance: 0 };
+    if (hatsArray && hatsArray.length) {
+      for (let i = 0; i < hatsArray.length; i++) {
+        const { topDonor } = await this.allUsersWithHat(
+          hatsArray[i].toString()
+        );
+
+        if (topDonor.balance > masterDonor.balance) masterDonor = topDonor;
+      }
+    }
+    return masterDonor;
   }
 }
 

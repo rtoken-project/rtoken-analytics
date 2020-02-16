@@ -425,6 +425,29 @@ class RTokenAnalytics {
     }
     return masterDonor;
   }
+  async sortHatsByReceivedSavingsOf(hats) {
+    const hatsArray = JSON.parse(hats);
+    const rdai = await this.getContract('rdai');
+    let hatObjectsArray = [];
+    if (hatsArray && hatsArray.length) {
+      for (let i = 0; i < hatsArray.length; i++) {
+        const { recipients, proportions } = await rdai.getHatByID(hatsArray[i]);
+        const receivedSavingsOf = await this.receivedSavingsOfByHat(
+          hatsArray[i]
+        );
+        hatObjectsArray.push({
+          recipients,
+          proportions,
+          hatID: hatsArray[i],
+          receivedSavingsOf
+        });
+      }
+    }
+    hatObjectsArray.sort(function(a, b) {
+      return b.receivedSavingsOf - a.receivedSavingsOf;
+    });
+    return hatObjectsArray;
+  }
 }
 
 module.exports = RTokenAnalytics;

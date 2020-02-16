@@ -41,10 +41,11 @@
     "apollo-link": "^1.2.13",
     "apollo-link-http": "^1.5.16",
     "axios": "^0.19.0",
+    "bignumber": "^1.1.0",
     "cross-fetch": "^3.0.4",
+    "ethers": "^4.0.40",
     "graphql-tag": "^2.10.1",
-    "xmlhttprequest": "^1.8.0",
-    "ethers": "^4.0.40"
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.3",

@@ -9,6 +9,7 @@ const { createHttpLink } = require('apollo-link-http');
 const ethers = require('ethers');
 const { parseUnits, formatUnits, bigNumberify } = ethers.utils;
 
+const BigNumber = require('bignumber.js');
 const CONTRACTS = require('./constants');
 
 const DEFAULT_SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/id/';
@@ -203,7 +204,7 @@ class RTokenAnalytics {
     };
     let res = await makePromise(execute(this.rTokenLink, operation));
     let interestSent = 0;
-    let value = new bigNumberify(0);
+    let value = new BigNumber(0);
     if (res.data.account.loansOwned.length < 1) return 0;
     const loan = res.data.account.loansOwned[0];
     for (let index = 0; index < loan.transfers.length; index++) {

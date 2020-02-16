@@ -11,10 +11,6 @@ const { parseUnits, formatUnits, bigNumberify } = ethers.utils;
 
 const CONTRACTS = require('./constants');
 
-const BigNumber = require('bignumber.js');
-
-// const { parseUnits, bigNumberify, formatUnits } = ethers.utils;
-
 const DEFAULT_SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/id/';
 const DEFAULT_SUBGRAPH_ID_RDAI =
   'QmfUZ16H2GBxQ4eULAELDJjjVZcZ36TcDkwhoZ9cjF2WNc';
@@ -207,7 +203,7 @@ class RTokenAnalytics {
     };
     let res = await makePromise(execute(this.rTokenLink, operation));
     let interestSent = 0;
-    let value = new BigNumber(0);
+    let value = new bigNumberify(0);
     if (res.data.account.loansOwned.length < 1) return 0;
     const loan = res.data.account.loansOwned[0];
     for (let index = 0; index < loan.transfers.length; index++) {

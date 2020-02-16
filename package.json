@@ -41,10 +41,10 @@
     "apollo-link": "^1.2.13",
     "apollo-link-http": "^1.5.16",
     "axios": "^0.19.0",
-    "bignumber": "^1.1.0",
     "cross-fetch": "^3.0.4",
     "graphql-tag": "^2.10.1",
-    "xmlhttprequest": "^1.8.0"
+    "xmlhttprequest": "^1.8.0",
+    "ethers": "^4.0.40"
   },
   "devDependencies": {
     "@babel/core": "^7.8.3",
@@ -59,7 +59,6 @@
     "eslint-plugin-react": "^7.18.0",
     "eslint-plugin-react-hooks": "^2.3.0",
     "eth-registry": "^1.2.0",
-    "ethers": "^4.0.40",
     "graphql": "^14.5.8",
     "mocha": "^6.2.2",
     "openzeppelin-solidity": "^2.4.0",

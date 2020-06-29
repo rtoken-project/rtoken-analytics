@@ -1,8 +1,9 @@
+require('babel-polyfill');
 const { execute, makePromise } = require('apollo-link');
 const gql = require('graphql-tag');
 const axios = require('axios');
 
-const fetch = require('node-fetch');
+const fetch = require('cross-fetch');
 const { createHttpLink } = require('apollo-link-http');
 // const ethers = require('ethers');
 
@@ -67,7 +68,6 @@ class RTokenAnalytics {
       query: gql`
         query getAccount($id: Bytes) {
           account(id: $id) {
-            balance
             loansOwned {
               amount
               recipient {
@@ -91,7 +91,10 @@ class RTokenAnalytics {
       variables: { id: address }
     };
     let res = await makePromise(execute(this.rTokenLink, operation));
-    return res.data.account.loansOwned;
+    let loansOwned = [];
+    if (res.data.account && res.data.account.loansOwned)
+      loansOwned = res.data.account.loansOwned;
+    return loansOwned;
   }
 
   // Returns list of addresses that have sent any interest to this address, and the amounts
@@ -123,7 +126,10 @@ class RTokenAnalytics {
       variables: { id: address }
     };
     let res = await makePromise(execute(this.rTokenLink, operation));
-    return res.data.account.loansReceived;
+    let loansReceived = [];
+    if (res.data.account && res.data.account.loansReceived)
+      loansReceived = res.data.account.loansReceived;
+    return loansReceived;
   }
 
   // SENDING / RECEIVING

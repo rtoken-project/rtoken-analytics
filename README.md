@@ -1,3 +1,5 @@
+## DEPRECATED: This package has been replaced by `@rtoken/utils` and the `rToken Subgraph` in the :arrow_right: [rtoken-monorepo](https://github.com/rtoken-project/rtoken-monorepo)
+
 # rToken Analytics
 
 This library provides tools for getting rDAI and rToken data into your dapp.
@@ -33,8 +35,8 @@ If you are using your own rToken subgraph, you will need to provide this info in
 
 ```js
 const options = {
-  subgraphURL: 'some other url',
-  rdaiSubgraphId: 'some other id'
+  subgraphURL: "some other url",
+  rdaiSubgraphId: "some other id",
 };
 const rTokenAnalytics = new RTokenAnalytics(options);
 ```
@@ -55,14 +57,14 @@ Returns array of active loans. Example:
 ```js
 [
   {
-    amount: '0.50000000058207661',
-    hat: { id: '11' },
-    recipient: { id: '0x358f6260f1f90cd11a10e251ce16ea526f131b02' }
+    amount: "0.50000000058207661",
+    hat: { id: "11" },
+    recipient: { id: "0x358f6260f1f90cd11a10e251ce16ea526f131b02" },
   },
   {
-    amount: '24.49999999941792339'
+    amount: "24.49999999941792339",
     // ...
-  }
+  },
 ];
 ```
 
@@ -229,10 +231,10 @@ nodemon -x yarn test_local
 This is one method for obtaining the Compound interest rate in your dapp.
 
 ```js
-import axios from 'axios';
+import axios from "axios";
 
-const COMPOUND_URL = 'https://api.compound.finance/api/v2/ctoken?addresses[]=';
-const daiCompoundAddress = '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643';
+const COMPOUND_URL = "https://api.compound.finance/api/v2/ctoken?addresses[]=";
+const daiCompoundAddress = "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643";
 
 const getCompoundRate = async () => {
   const res = await axios.get(`${COMPOUND_URL}${daiCompoundAddress}`);
@@ -241,7 +243,7 @@ const getCompoundRate = async () => {
 
   return {
     compoundRate,
-    compoundRateFormatted
+    compoundRateFormatted,
   };
 };
 ```
@@ -255,8 +257,8 @@ console.log(`Compound Rate: ${compoundRateFormatted}%`);
 // > Compound Rate: 4.56%
 
 // Recommend you save the rate for quick reference, as the API can be slow.
-if (typeof window !== 'undefined') {
-  localStorage.setItem('compoundRate', compoundRate);
+if (typeof window !== "undefined") {
+  localStorage.setItem("compoundRate", compoundRate);
 }
 ```
 
